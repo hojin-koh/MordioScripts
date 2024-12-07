@@ -95,6 +95,12 @@ if [[ -n "${DIR_SPECIFICEXP-}" ]]; then
   fi
 fi # End if specific experiment present
 
+# Binary things
+make -C "$DIR_COMMONEXP/src"
+if [[ ! -h "$TARGET/bc" ]]; then
+  ln -sTv "$DIR_COMMONEXP/bin" "$TARGET/bc"
+fi
+
 # Make a "relink" script
 if [[ ! -x "$TARGET/link.again.sh" ]]; then
   rm -fv "$TARGET/link.again.sh"
