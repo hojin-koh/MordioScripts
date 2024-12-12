@@ -32,7 +32,7 @@ main() {
   fi
 
   local nr
-  getMeta in '' nRecord nr
+  getMeta in 0 nRecord nr
   in::load \
   | uc/normalize-unicode.py <(conv::load) text \
   | lineProgressBar $nr \

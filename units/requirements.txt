@@ -1,0 +1,9 @@
+Jinja2
+
+# Huggingface's BERT and LLM things
+tqdm
+transformers
+bitsandbytes
+optimum
+accelerate
+vllm

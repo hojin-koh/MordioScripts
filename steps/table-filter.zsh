@@ -12,34 +12,41 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Generate a new table based on another table with a perl conversion rule"
-dependencies=()
-importantconfig=(header rule)
+description="Filter a table through other tables and a python expression"
+dependencies=( "uc/table-filter.py" )
+importantconfig=(filt nameKey omitAbsentKeys)
 
 setupArgs() {
   opt -r out '' "Output table"
   optType out output table
 
-  opt -r header '' "Table header of the new table"
-  opt -r rule '' "Perl conversion rule"
   opt -r in '' "Input table"
   optType in input table
+  opt -r infilt '()' "Filter table"
+  optType infilt input table
+
+  opt filt '1 == 1' "Filter expression in python, like \$F eq \"train\""
+  opt nameKey 'id' "Name of the column containing keys for filtering"
+  opt omitAbsentKeys true "Whether to omit keys from output that don't exist in filter tables"
 }
 
 main() {
-  if ! out::ALL::isReal; then
-    err "Unreal table output not supported" 15
+  local param="$(in::getLoader) | uc/table-filter.py"
+  if [[ $omitAbsentKeys == true ]]; then
+    param+=" --omit-absent-keys"
   fi
+  param+=" '$nameKey' ${(q+)filt}"
+  
+  local i
+  for (( i=1; i<=$#infilt; i++ )); do
+    param+=" <($(infilt::getLoader $i))"
+  done
 
-  info "Header: $header"
-  info "ID conversion rule: $rule"
-
-  local param="echo '$header'; $(in::getLoader) | tail +2 | perl -CSAD -nle '$rule'"
-  if out::isReal; then
-    eval "$param" | out::save
+  if out::isReal $i; then
+    eval "$param" | out::save $i
     if [[ $? != 0 ]]; then return 1; fi
   else
-    echo "$param" | out::save
+    echo "$param" | out::save $i
     if [[ $? != 0 ]]; then return 1; fi
   fi
 }

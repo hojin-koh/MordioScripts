@@ -14,16 +14,19 @@
 # limitations under the License.
 description="Count how many tokens is in all fields except id"
 dependencies=( "uc/count-tokens.pl" )
+importantconfig=(name)
 
 setupArgs() {
   opt -r in '' "Input table"
   optType in input table
   opt -r out '' "Output table"
   optType out output table
+
+  opt name 'ntoken' "Name of the field of this count in the resultant table"
 }
 
 main() {
-  local param="echo 'id,count'; $(in::getLoader) | tail +2 | uc/count-tokens.pl"
+  local param="echo 'id,$name'; $(in::getLoader) | tail +2 | uc/count-tokens.pl"
   if out::isReal; then
     eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi

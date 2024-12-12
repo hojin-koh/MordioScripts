@@ -12,18 +12,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Generate a new table based on another table with a perl conversion rule"
-dependencies=()
-importantconfig=(header rule)
+description="Do zero-shot text rewrite on a list of documents based on a HF model"
+dependencies=( "uc/llm/rewrite-zeroshot.py" )
+importantconfig=(model)
+veryexpensive=true
 
 setupArgs() {
-  opt -r out '' "Output table"
+  opt -r out '' "Output text"
   optType out output table
 
-  opt -r header '' "Table header of the new table"
-  opt -r rule '' "Perl conversion rule"
-  opt -r in '' "Input table"
+  opt -r in '' "Input text"
   optType in input table
+  opt -r config '' "Input config"
+  optType config input table
+
+  opt model "unsloth/Llama-3.1-8B-Instruct" "name of HuggingFace, will be loaded with AutoModelForCausalLM and AutoTokenizer"
+  opt temperature 0.6 "Temperature for LLM sampling"
 }
 
 main() {
@@ -31,17 +35,14 @@ main() {
     err "Unreal table output not supported" 15
   fi
 
-  info "Header: $header"
-  info "ID conversion rule: $rule"
+  local nr
+  getMeta in 0 nRecord nr
 
-  local param="echo '$header'; $(in::getLoader) | tail +2 | perl -CSAD -nle '$rule'"
-  if out::isReal; then
-    eval "$param" | out::save
-    if [[ $? != 0 ]]; then return 1; fi
-  else
-    echo "$param" | out::save
-    if [[ $? != 0 ]]; then return 1; fi
-  fi
+  in::load \
+  | uc/llm/rewrite-zeroshot.py "$model" 8192 <(config::load) \
+  | lineProgressBar $nr \
+  | out::save
+  if [[ $? != 0 ]]; then return 1; fi
 }
 
 source Mordio/mordio

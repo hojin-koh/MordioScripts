@@ -12,18 +12,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Generate a new table based on another table with a perl conversion rule"
+description="Generate a new table from content entered on the command line"
 dependencies=()
-importantconfig=(header rule)
+importantconfig=(header data)
 
 setupArgs() {
   opt -r out '' "Output table"
   optType out output table
 
   opt -r header '' "Table header of the new table"
-  opt -r rule '' "Perl conversion rule"
-  opt -r in '' "Input table"
-  optType in input table
+  opt -r data '()' "Data lines"
 }
 
 main() {
@@ -32,16 +30,14 @@ main() {
   fi
 
   info "Header: $header"
-  info "ID conversion rule: $rule"
-
-  local param="echo '$header'; $(in::getLoader) | tail +2 | perl -CSAD -nle '$rule'"
-  if out::isReal; then
-    eval "$param" | out::save
-    if [[ $? != 0 ]]; then return 1; fi
-  else
-    echo "$param" | out::save
-    if [[ $? != 0 ]]; then return 1; fi
-  fi
+  local line
+  (
+    echo "$header";
+    for line in "${data[@]}"; do
+      printf '%s\n' "$line"
+    done
+  ) \
+  | out::save
 }
 
 source Mordio/mordio

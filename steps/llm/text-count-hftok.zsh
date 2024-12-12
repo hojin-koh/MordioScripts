@@ -12,18 +12,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Generate a new table based on another table with a perl conversion rule"
-dependencies=()
-importantconfig=(header rule)
+description="Get token count based on a HF model"
+dependencies=( "uc/llm/text-count-hftok.py" )
+importantconfig=(model)
 
 setupArgs() {
-  opt -r out '' "Output table"
+  opt -r out '' "Output count table"
   optType out output table
 
-  opt -r header '' "Table header of the new table"
-  opt -r rule '' "Perl conversion rule"
-  opt -r in '' "Input table"
+  opt -r in '' "Input text"
   optType in input table
+
+  opt model "unsloth/Llama-3.2-1B-Instruct" "name of HuggingFace tokenizer model, will be loaded with AutoTokenizer"
 }
 
 main() {
@@ -31,17 +31,14 @@ main() {
     err "Unreal table output not supported" 15
   fi
 
-  info "Header: $header"
-  info "ID conversion rule: $rule"
+  local nr
+  getMeta in 0 nRecord nr
 
-  local param="echo '$header'; $(in::getLoader) | tail +2 | perl -CSAD -nle '$rule'"
-  if out::isReal; then
-    eval "$param" | out::save
-    if [[ $? != 0 ]]; then return 1; fi
-  else
-    echo "$param" | out::save
-    if [[ $? != 0 ]]; then return 1; fi
-  fi
+  in::load \
+  | uc/llm/text-count-hftok.py "$model" \
+  | lineProgressBar $nr \
+  | out::save
+  if [[ $? != 0 ]]; then return 1; fi
 }
 
 source Mordio/mordio
