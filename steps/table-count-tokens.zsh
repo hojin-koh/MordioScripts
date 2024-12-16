@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Count how many tokens is in all fields except id"
-dependencies=( "uc/count-tokens.pl" )
+dependencies=( "uc/table-count-tokens.py" )
 importantconfig=(name)
 
 setupArgs() {
@@ -26,7 +26,7 @@ setupArgs() {
 }
 
 main() {
-  local param="echo 'id,$name'; $(in::getLoader) | tail +2 | uc/count-tokens.pl"
+  local param="$(in::getLoader) | uc/table-count-tokens.py '$name'"
   if out::isReal; then
     eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
