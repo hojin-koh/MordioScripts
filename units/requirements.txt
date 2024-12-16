@@ -1,5 +1,12 @@
 Jinja2
 
+# Chinese/Japanese things
+OpenCC
+
+# General machine learning
+numpy
+scikit-learn
+
 # Huggingface's BERT and LLM things
 tqdm
 transformers
