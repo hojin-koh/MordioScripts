@@ -32,9 +32,9 @@ def main():
     objWriter.writeheader()
 
     for row in objReader:
-        eid = row[nameKey]
+        key = row[nameKey]
         cnt = len(row[nameText].replace("\\n", "\n").strip().split())
-        objWriter.writerow({nameKey: eid, nameOutput: cnt})
+        objWriter.writerow({nameKey: key, nameOutput: cnt})
 
 if __name__ == '__main__':
     main()

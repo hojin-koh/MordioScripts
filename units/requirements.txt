@@ -3,8 +3,9 @@ Jinja2
 # Chinese/Japanese things
 OpenCC
 
-# General machine learning
+# General machine learning / stats
 numpy
+scipy
 scikit-learn
 
 # Huggingface's BERT and LLM things

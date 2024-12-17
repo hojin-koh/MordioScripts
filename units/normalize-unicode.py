@@ -51,9 +51,9 @@ def main():
         objWriter = csv.DictWriter(sys.stdout, (nameKey, nameText), lineterminator="\n")
         objWriter.writeheader()
         for row in objReader:
-            eid = row[nameKey]
+            key = row[nameKey]
             text = normalize(objTrans, row[nameText].replace("\\n", "\n").strip())
-            objWriter.writerow({nameKey: eid, nameText: text.replace("\n", "\\n")})
+            objWriter.writerow({nameKey: key, nameText: text.replace("\n", "\\n")})
 
     elif sys.argv[2] == "key":
         objReader = csv.DictReader(sys.stdin)

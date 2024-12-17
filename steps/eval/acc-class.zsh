@@ -12,29 +12,29 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Train a BERT classifier"
-dependencies=( "uc/llm/bertclass-train.py" )
-importantconfig=( typeModel nameModel )
+description="Compute per-entry accuracy for classification"
+dependencies=( "uc/eval/acc-class.py" )
 
 setupArgs() {
-  opt -r out '' "Output BERT"
-  optType out output modeldir
+  opt -r out '' "Output accuracy table"
+  optType out output table
 
-  opt -r in '' "Input text"
+  opt -r in '' "Input predict table"
   optType in input table
-  opt -r inLabel '' "Input label"
-  optType inLabel input table
-
-  opt typeModel "BERT" "type of HuggingFace Transformer model"
-  opt nameModel "bert-base-chinese" "name of HuggingFace base model"
+  opt -r label '' "Input label table"
+  optType label input table
 }
 
 main() {
-  local outThis
-  out::putDir outThis
+  local param="$(in::getLoader) | uc/eval/acc-class.py <($(label::getLoader))"
 
-  in::load \
-  | CUDA_VISIBLE_DEVICES=0 uc/llm/bertclass-train.py "$outThis" "$typeModel" "$nameModel" <(inLabel::load)
+  if out::isReal; then
+    eval "$param" | out::save
+    if [[ $? != 0 ]]; then return 1; fi
+  else
+    echo "$param" | out::save
+    if [[ $? != 0 ]]; then return 1; fi
+  fi
 }
 
 source Mordio/mordio

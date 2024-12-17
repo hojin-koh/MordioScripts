@@ -14,31 +14,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Get token count from a HF-compatible tokenizer
-# Usage: text-count-hftok.py <model>
+# Check for classification accuracy given a space-separated label list
+# When there are multiple labels in the label file, matching any one results in 100% accuracy
+# (For real multi-label classification things, please use precision-recall)
 
 import csv
 import sys
 
-from transformers import AutoTokenizer
-
 def main():
-    nameModel = sys.argv[1]
-    objTok = AutoTokenizer.from_pretrained(nameModel, do_lower_case=False, clean_up_tokenization_spaces=False)
+    fileLabel = sys.argv[1]
+
+    mLabel = {}
+    with open(fileLabel, "r", encoding='utf-8') as fp:
+        objReader = csv.DictReader(fp)
+        nameKey = objReader.fieldnames[0]
+        nameLabel = objReader.fieldnames[1]
+        for row in objReader:
+            mLabel[row[nameKey]] = set(row[nameLabel].strip().split())
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
     nameKey = objReader.fieldnames[0]
-    nameText = objReader.fieldnames[1]
-    objWriter = csv.DictWriter(sys.stdout, (nameKey, 'ntoken'), lineterminator="\n")
+    namePred = objReader.fieldnames[1]
+    objWriter = csv.DictWriter(sys.stdout, (nameKey, 'acc'), lineterminator="\n")
     objWriter.writeheader()
 
     for row in objReader:
         key = row[nameKey]
-        text = row[nameText].replace("\\n", "\n").strip()
-        nTok = len(objTok.encode(text, padding=False, truncation=False))
-        objWriter.writerow({nameKey: key, 'ntoken': nTok})
+        if row[namePred] in mLabel[key]:
+            acc = 1
+        else:
+            acc = 0
+        objWriter.writerow({nameKey: key, 'acc': acc})
 
 if __name__ == '__main__':
     main()

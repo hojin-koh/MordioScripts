@@ -25,9 +25,14 @@ import torch
 from transformers import Trainer, TrainingArguments
 from sklearn.model_selection import train_test_split
 
-os.environ['TQDM_MININTERVAL'] = '2'
-os.environ['TQDM_SMOOTHING'] = '0'
-os.environ['TQDM_DYNAMIC_NCOLS'] = '1'
+# Override some defaults in tqdm: dirty hack
+import tqdm.asyncio
+from functools import partialmethod
+try:
+    fpShow = open('/dev/fd/5', 'w', encoding='utf-8')
+    tqdm.asyncio.tqdm.__init__ = partialmethod(tqdm.asyncio.tqdm.__init__, file=fpShow, smoothing=0, mininterval=2)
+except e:
+    raise e
 
 def computeMetricHF(pred):
     aPreds = pred.predictions.argmax(-1)
@@ -126,10 +131,10 @@ def main():
             eval_on_start=False,
             metric_for_best_model="acc",
             auto_find_batch_size=True,
-            per_device_train_batch_size=64,
-            per_device_eval_batch_size=64,
+            per_device_train_batch_size=8,
+            per_device_eval_batch_size=8,
             num_train_epochs=15,
-            warmup_ratio=0.1,
+            warmup_ratio=0.3,
             )
 
     objTrainer = Trainer(
