@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Do zero-shot text rewrite on a list of documents based on a HF model"
 dependencies=( "uc/llm/rewrite-zeroshot.py" )
-importantconfig=(model)
+importantconfig=(model tokenizer temperature context)
 veryexpensive=true
 
 setupArgs() {
@@ -26,7 +26,9 @@ setupArgs() {
   opt -r config '' "Input config"
   optType config input table
 
-  opt model "unsloth/Llama-3.1-8B-Instruct" "name of HuggingFace, will be loaded with AutoModelForCausalLM and AutoTokenizer"
+  opt context 8192 "Size of context window to use"
+  opt model "unsloth/Llama-3.1-8B-Instruct" "name of HuggingFace model or filename of gguf model"
+  opt tokenizer "unsloth/Llama-3.1-8B-Instruct" "name of HuggingFace tokenizer"
   opt temperature 0.6 "Temperature for LLM sampling"
 }
 
@@ -38,10 +40,18 @@ main() {
   local nr
   getMeta in 0 nRecord nr
 
+  local dirTemp
+  putTemp dirTemp
+
+  mkfifo $dirTemp/pipe
+
   in::load \
-  | uc/llm/rewrite-zeroshot.py "$model" 8192 <(config::load) \
-  | lineProgressBar $nr \
-  | out::save
+  | uc/llm/rewrite-zeroshot.py "$model" "$tokenizer" "$context" <(config::load) $dirTemp/pipe &
+
+  cat $dirTemp/pipe \
+  | lineProgressBar $nr > $dirTemp/output
+
+  cat $dirTemp/output | out::save
   if [[ $? != 0 ]]; then return 1; fi
 }
 
