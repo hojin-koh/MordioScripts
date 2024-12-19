@@ -32,7 +32,7 @@ try:
     fpShow = open('/dev/fd/5', 'w', encoding='utf-8')
     tqdm.asyncio.tqdm.__init__ = partialmethod(tqdm.asyncio.tqdm.__init__, file=fpShow, smoothing=0, mininterval=2)
 except e:
-    raise e
+    pass
 
 def computeMetricHF(pred):
     aPreds = pred.predictions.argmax(-1)
