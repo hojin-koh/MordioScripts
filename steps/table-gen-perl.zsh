@@ -27,10 +27,6 @@ setupArgs() {
 }
 
 main() {
-  if ! out::ALL::isReal; then
-    err "Unreal table output not supported" 15
-  fi
-
   info "Header: $header"
   info "ID conversion rule: $rule"
 
