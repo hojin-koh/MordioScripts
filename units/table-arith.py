@@ -15,7 +15,7 @@
 # limitations under the License.
 
 # Based on a series of tables containing data regarding the keys
-# Perform filtering on the input table
+# Do arithematic and output some new values
 
 import csv
 import re # Kept here for potential use in the expression
@@ -43,10 +43,13 @@ def main():
         modeOmit = True
         sys.argv.pop(1)
     nameKey = sys.argv[1]
-    exprFilter = sys.argv[2]
 
     mData = {}
-    for fname in (sys.argv[i] for i in range(3, len(sys.argv))):
+    while len(sys.argv) > 2:
+        fname = sys.argv[2]
+        sys.argv.pop(2)
+        if fname == '--':
+            break
         with open(fname, encoding='utf-8') as fp:
             objReader = csv.DictReader(fp)
             for row in objReader:
@@ -55,20 +58,29 @@ def main():
                     mData[key] = {}
                 addToRecord(mData[key], objReader.fieldnames, nameKey, row)
 
+    aField = []
+    aArith = []
+    while len(sys.argv) > 2:
+        aField.append(sys.argv[2])
+        aArith.append(sys.argv[3])
+        sys.argv.pop(3)
+        sys.argv.pop(2)
+
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    objWriter = csv.DictWriter(sys.stdout, objReader.fieldnames, lineterminator="\n")
+    objWriter = csv.DictWriter(sys.stdout, (nameKey, *aField), lineterminator="\n")
     objWriter.writeheader()
     for row in objReader:
         key = row[nameKey] # It will crash if nameKey is not present, which is exactly what we want here
         if key not in mData:
-            if not modeOmit:
-                objWriter.writerow(row)
-            continue
-        record = mData[key]
-        if eval(exprFilter):
-            objWriter.writerow(row)
+            if modeOmit:
+                continue
+        data = mData[key] # It will crash if not modeOmit and key not in mData
+        mVal = {nameKey: key}
+        for i in range(len(aField)):
+            mVal[aField[i]] = eval(aArith[i])
+        objWriter.writerow(mVal)
 
 if __name__ == '__main__':
     main()

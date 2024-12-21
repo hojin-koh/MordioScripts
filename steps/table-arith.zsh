@@ -12,9 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Filter a table through other tables and a python expression"
-dependencies=( "uc/table-filter.py" )
-importantconfig=(filt nameKey omitAbsentKeys)
+description="Do arithmetics with fields with multiple tables"
+dependencies=("uc/table-arith.py")
+importantconfig=(nameKey omitAbsentKeys field arith)
 
 setupArgs() {
   opt -r out '' "Output table"
@@ -22,24 +22,30 @@ setupArgs() {
 
   opt -r in '' "Input table"
   optType in input table
-  opt -r infilt '()' "Filter table"
-  optType infilt input table
+  opt -r indata '()' "Data input tables"
+  optType indata input table
 
-  opt filt '1 == 1' "Filter expression in python, like record['grade'] >= 5 and record['ntoken'] < 3000"
+  opt -r field '()' "Name of output fields"
+  opt -r arith '()' "Python arithemetic expression, like data['grade'][0] + max(data['ntoken'])"
   opt nameKey 'id' "Name of the column containing keys for filtering"
-  opt omitAbsentKeys true "Whether to omit keys from output that don't exist in filter tables"
+  opt omitAbsentKeys true "Whether to silently omit keys from output that don't exist in data tables"
 }
 
 main() {
-  local param="$(in::getLoader) | uc/table-filter.py"
+  local param="$(in::getLoader) | uc/table-arith.py"
   if [[ $omitAbsentKeys == true ]]; then
     param+=" --omit-absent-keys"
   fi
-  param+=" '$nameKey' ${(q+)filt}"
-  
+  param+=" $nameKey"
+
   local i
-  for (( i=1; i<=$#infilt; i++ )); do
-    param+=" <($(infilt::getLoader $i))"
+  for (( i=1; i<=$#indata; i++ )); do
+    param+=" <($(indata::getLoader $i))"
+  done
+  param+=" --"
+
+  for (( i=1; i<=$#field; i++ )); do
+    param+=" ${(q+)field[$i]} ${(q+)arith[$i]}"
   done
 
   if out::isReal $i; then
