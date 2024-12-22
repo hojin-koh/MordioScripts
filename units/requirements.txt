@@ -15,3 +15,7 @@ bitsandbytes
 optimum
 accelerate
 vllm
+
+# Evaluation tools
+bert_score
+rouge_metric
