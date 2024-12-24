@@ -19,12 +19,13 @@
 import csv
 import sys
 
-from bert_score import BERTScorer
+from rouge_metric import PyRouge
 
 def main():
-    objBERTScore = BERTScorer(lang=sys.argv[1], rescale_with_baseline=False)
-    fileRef = sys.argv[2]
+    objRouge = PyRouge(rouge_n=(1, 2), rouge_l=True)
+    fileRef = sys.argv[1]
 
+    aTypes = ('rouge-1', 'rouge-2', 'rouge-l')
     mRef = {}
     with open(fileRef, "r", encoding='utf-8') as fp:
         objReader = csv.DictReader(fp)
@@ -38,15 +39,25 @@ def main():
     objReader = csv.DictReader(sys.stdin)
     nameKey = objReader.fieldnames[0]
     nameText = objReader.fieldnames[1]
-    objWriter = csv.DictWriter(sys.stdout, (nameKey, 'bs-p', 'bs-r', 'bs-f1'), lineterminator="\n")
+    aCols = [nameKey]
+    for typ in ('rs1', 'rs2', 'rsl'):
+        aCols.append(F'{typ}-p')
+        aCols.append(F'{typ}-r')
+        aCols.append(F'{typ}-f1')
+    objWriter = csv.DictWriter(sys.stdout, aCols, lineterminator="\n")
     objWriter.writeheader()
 
     for row in objReader:
         key = row[nameKey]
         text = row[nameText].replace("\\n", "\n").strip()
         # The cursed brackets are because this library expects hyp to be in a list, and ref in a list of lists (to support multiple references)
-        p, r, f = objBERTScore.score([text], [[mRef[key]]])
-        objWriter.writerow({nameKey: key, 'bs-p': p.item(), 'bs-r': r.item(), 'bs-f1': f.item()})
+        mRouge = objRouge.evaluate([text], [[mRef[key]]])
+        mRslt = {nameKey: key}
+        for typ, typLib in (('rs1', 'rouge-1'), ('rs2', 'rouge-2'), ('rsl', 'rouge-l')):
+            mRslt[F'{typ}-p'] = mRouge[typLib]['p']
+            mRslt[F'{typ}-r'] = mRouge[typLib]['r']
+            mRslt[F'{typ}-f1'] = mRouge[typLib]['f']
+        objWriter.writerow(mRslt)
 
 if __name__ == '__main__':
     main()
