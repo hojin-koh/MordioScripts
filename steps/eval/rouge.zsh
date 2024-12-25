@@ -44,10 +44,8 @@ main() {
     | out::save
     if [[ $? != 0 ]]; then return 1; fi
   else
-    # Get a list of all text
-    in::loadKey > "$dirTemp/all.list"
     in::load \
-    | doParallelPipeText "$nj" "$nr" "$dirTemp/all.list" \
+    | doParallelPipeCsv "$nj" "$nr" \
     "$dirTemp" \
     "processSub" \
     | out::save

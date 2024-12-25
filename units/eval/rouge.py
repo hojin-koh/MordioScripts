@@ -58,6 +58,7 @@ def main():
             mRslt[F'{typ}-r'] = mRouge[typLib]['r']
             mRslt[F'{typ}-f1'] = mRouge[typLib]['f']
         objWriter.writerow(mRslt)
+        sys.stdout.flush()
 
 if __name__ == '__main__':
     main()
