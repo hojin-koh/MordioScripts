@@ -25,6 +25,7 @@ setupArgs() {
 
   opt -r mode '' "CV/mean"
   opt -r tag '()' "Tag used for each input file in mean mode, or the overall tag for CV mode"
+  opt fields '' "Comma-separated fields to be processed"
 }
 
 main() {
@@ -34,7 +35,7 @@ main() {
     for (( i=1; i<=$#in; i++ )); do
       param+=" <($(in::getLoader $i))"
     done
-    eval "uc/eval/mean-boot.py ${tag[1]} $param" \
+    eval "uc/eval/mean-boot.py "$fields" ${tag[1]} $param" \
     | out::save
     if [[ $? != 0 ]]; then return 1; fi
   elif [[ $mode == mean ]]; then

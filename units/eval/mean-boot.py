@@ -29,12 +29,15 @@ def meanWeighted(aSamples, aWeights):
     return np.average(aSamples, weights=aWeights)
 
 def main():
-    tagOutput = sys.argv[1]
+    aFields = sys.argv[1].strip().split(',') if len(sys.argv[1]) > 0 else None
+    tagOutput = sys.argv[2]
 
-    aFields = None
-    maData = {}
+    if aFields is not None:
+        maData = {field: [] for field in aFields}
+    else:
+        maData = {} # Will be initialized later
     aWeights = []
-    for fname in sys.argv[2:]:
+    for fname in sys.argv[3:]:
         nData = 0
         with open(fname, "r", encoding='utf-8') as fp:
             objReader = csv.DictReader(fp)

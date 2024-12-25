@@ -12,51 +12,35 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Compute ROUGE-{1,2,L} scores"
-dependencies=("uc/eval/rouge.py")
-importantconfig=()
+description="Do arithmetics with fields with multiple tables"
+dependencies=("uc/table-combine.py")
+importantconfig=(nameKey)
 
 setupArgs() {
-  opt -r in '' "Input text"
-  optType in input table
-  opt -r ref '' "Reference text"
-  optType ref input table
   opt -r out '' "Output table"
   optType out output table
+
+  opt -r in '()' "Input tables"
+  optType in input table
+
+  opt nameKey 'id' "Name of the column containing keys for filtering"
 }
 
 main() {
-  if ! out::ALL::isReal; then
-    err "Unreal table output not supported" 15
-  fi
+  local param="uc/table-combine.py $nameKey"
 
-  local dirTemp
-  putTemp dirTemp
+  local i
+  for (( i=1; i<=$#in; i++ )); do
+    param+=" <($(in::getLoader $i))"
+  done
 
-  local nr
-  getMeta in 0 nRecord nr
-
-  # ROUGE is a bit slow, and we expect evaluations to run fast
-  if [[ $nr -lt 500 ]]; then
-    in::load \
-    | processSub \
-    | lineProgressBar $nr \
-    | out::save
+  if out::isReal; then
+    eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   else
-    # Get a list of all text
-    in::loadKey > "$dirTemp/all.list"
-    in::load \
-    | doParallelPipeText "$nj" "$nr" "$dirTemp/all.list" \
-    "$dirTemp" \
-    "processSub" \
-    | out::save
+    echo "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   fi
-}
-
-processSub() {
-  uc/eval/rouge.py <(ref::load)
 }
 
 source Mordio/mordio
