@@ -20,8 +20,12 @@
 import csv
 import sys
 
-def addToRecord(mRecord, aFields, nameKey, row):
-    for field in aFields:
+if sys.version_info < (3, 7):
+    print("Error: minimum supported python version is 3.7 (for dict to preserve insertion order)", file=sys.stderr)
+    sys.exit(37)
+
+def addToRecord(mRecord, mFields, nameKey, row):
+    for field in mFields.keys():
         if field == nameKey:
             mRecord[nameKey] = row[nameKey]
             continue
@@ -30,32 +34,24 @@ def addToRecord(mRecord, aFields, nameKey, row):
 def main():
     nameKey = sys.argv[1]
 
-    mData = {}
-    sKeys = set()
-    aOrder = []
-    sFields = set()
-    aFields = []
+    mData = {} # Use dict to preserve insertion order and to act as a set
+    mFields = {} # Use dict to preserve insertion order and to act as a set
     for fname in sys.argv[2:]:
         with open(fname, encoding='utf-8') as fp:
             objReader = csv.DictReader(fp)
             for field in objReader.fieldnames:
-                if field not in sFields:
-                    sFields.add(field)
-                    aFields.append(field)
+                mFields[field] = True
             for row in objReader:
                 key = row[nameKey] # It should crash if nameKey is not present, which is exactly what we want here
-                if key not in sKeys:
-                    sKeys.add(key)
-                    aOrder.append(key)
                 if key not in mData:
                     mData[key] = {}
                 addToRecord(mData[key], objReader.fieldnames, nameKey, row)
 
     sys.stdout.reconfigure(encoding='utf-8')
-    objWriter = csv.DictWriter(sys.stdout, aFields, lineterminator="\n")
+    objWriter = csv.DictWriter(sys.stdout, tuple(mFields.keys()), lineterminator="\n")
     objWriter.writeheader()
 
-    for key in aOrder:
+    for key in mData.keys():
         mVals = mData[key]
         objWriter.writerow(mVals)
 

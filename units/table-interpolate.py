@@ -22,6 +22,10 @@ import sys
 
 from math import ceil
 
+if sys.version_info < (3, 7):
+    print("Error: minimum supported python version is 3.7 (for dict to preserve insertion order)", file=sys.stderr)
+    sys.exit(37)
+
 def main():
     modeNormalize = False
     if sys.argv[1] == '--normalize':
@@ -30,15 +34,12 @@ def main():
     nameKey = ""
 
     isFloat = False
-    aaOrder = [] # Recording the order inside each table
     aCnt = [] # Recording the total sum of each table
-    amTable = [] 
+    amTable = [] # This should preserve insertion order in python 3.7+
 
     for w, fname in ((float(sys.argv[i]), sys.argv[i+1]) for i in range(1, len(sys.argv), 2)):
         amTable.append({})
         mTable = amTable[-1]
-        aaOrder.append([])
-        aOrder = aaOrder[-1]
         cntThis = 0
 
         with open(fname, encoding='utf-8') as fp:
@@ -63,7 +64,6 @@ def main():
                 val *= 1.0 * w # Force into float
 
                 if key not in mTable:
-                    aOrder.append(key)
                     mTable[key] = val
                 else:
                     mTable[key] += val
@@ -72,12 +72,10 @@ def main():
 
     # Normalize each table, then add to the overall table
     mTable = {}
-    aOrder = []
     for i, (cnt, mTableThis) in enumerate(zip(aCnt, amTable)):
-        for key in aaOrder[i]:
+        for key in amTable[i].keys():
             if key not in mTable:
                 mTable[key] = 0
-                aOrder.append(key)
             if modeNormalize:
                 mTable[key] += mTableThis[key] / cnt * aCnt[0]
             else:
@@ -90,11 +88,11 @@ def main():
 
     # Output
     if isFloat:
-        for k in aOrder:
+        for k in mTable.keys():
             v = mTable[k]
             objWriter.writerow({nameKey: k, nameColumn: v})
     else:
-        for k in aOrder:
+        for k in mTable.keys():
             v = mTable[k]
             objWriter.writerow({nameKey: k, nameColumn: ceil(v)})
 
