@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Folderize multiple tables into one table by prefixing/postfixing tag"
-dependencies=("uc/table-folderize.py")
-importantconfig=(tag mode)
+metaDepScripts=("uc/table-folderize.py")
+metaDepOpts=(tag mode)
 
 setupArgs() {
   opt -r out '' "Output table"

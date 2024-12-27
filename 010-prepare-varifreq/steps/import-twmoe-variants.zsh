@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Import twmoe variants table from https://github.com/kcwu/moedict-variants"
-dependencies=("us/parse-variants-confusables.py")
-importantconfig=()
+metaDepScripts=("us/parse-variants-confusables.py")
+metaDepOpts=()
 
 setupArgs() {
   opt -r out '' "Output table"

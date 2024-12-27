@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Generate a new table from content entered on the command line"
-dependencies=()
-importantconfig=(header data)
+metaDepScripts=()
+metaDepOpts=(header data)
 
 setupArgs() {
   opt -r out '' "Output table"

@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Normalize unicode in the keys of a table"
-dependencies=("uc/normalize-unicode.py" "uc/table-interpolate.py") # "uc/table-merge.py" 
-importantconfig=(mode)
+metaDepScripts=("uc/normalize-unicode.py" "uc/table-interpolate.py") # "uc/table-merge.py" 
+metaDepOpts=(mode)
 
 setupArgs() {
   opt -r out '' "Output table"

@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Do kanji transformations with OpenCC"
-dependencies=("uc/text-opencc.py")
-importantconfig=(config fields)
+metaDepScripts=("uc/text-opencc.py")
+metaDepOpts=(config fields)
 
 setupArgs() {
   opt -r out '' "Output text"

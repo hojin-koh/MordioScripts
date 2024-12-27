@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Compute mean and bootstrapped 95% confidence interval for some statistics"
-dependencies=("uc/eval/mean-boot.py")
-importantconfig=(mode tag fields)
+metaDepScripts=("uc/eval/mean-boot.py")
+metaDepOpts=(mode tag fields)
 
 setupArgs() {
   opt -r out '' "Output result table"

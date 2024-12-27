@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Do arithmetics with fields with multiple tables"
-dependencies=("uc/table-arith.py")
-importantconfig=(omitAbsentKeys field arith)
+metaDepScripts=("uc/table-arith.py")
+metaDepOpts=(omitAbsentKeys field arith)
 
 setupArgs() {
   opt -r out '' "Output table"

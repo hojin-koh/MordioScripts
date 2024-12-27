@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Normalize unicode in the text"
-dependencies=("uc/normalize-unicode.py")
-importantconfig=(fieldInput)
+metaDepScripts=("uc/normalize-unicode.py")
+metaDepOpts=(fieldInput)
 
 setupArgs() {
   opt -r out '' "Output text"

@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Segment the text document into characters"
-dependencies=("uc/text-delete-nonnlp.pl")
-importantconfig=(header)
+metaDepScripts=("uc/text-delete-nonnlp.pl")
+metaDepOpts=(header)
 
 setupArgs() {
   opt -r in '' "Input text"

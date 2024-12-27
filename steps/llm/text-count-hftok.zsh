@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Get token count based on a HF model"
-dependencies=("uc/llm/text-count-hftok.py")
-importantconfig=(model fieldOutput fieldInput)
+metaDepScripts=("uc/llm/text-count-hftok.py")
+metaDepOpts=(model fieldOutput fieldInput)
 
 setupArgs() {
   opt -r out '' "Output count table"

@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Generate a new table based on another table with a perl conversion rule"
-dependencies=()
-importantconfig=(header rule)
+metaDepScripts=()
+metaDepOpts=(header rule)
 
 setupArgs() {
   opt -r out '' "Output table"

@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Do zero-shot text rewrite on a list of documents based on a HF model"
-dependencies=("uc/llm/rewrite-zeroshot.py")
-importantconfig=(model tokenizer temperature context)
+metaDepScripts=("uc/llm/rewrite-zeroshot.py")
+metaDepOpts=(model tokenizer temperature context)
 veryexpensive=true
 
 setupArgs() {

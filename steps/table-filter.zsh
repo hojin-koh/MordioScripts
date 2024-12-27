@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Filter a table through other tables and a python expression"
-dependencies=("uc/table-filter.py")
-importantconfig=(filt omitAbsentKeys)
+metaDepScripts=("uc/table-filter.py")
+metaDepOpts=(filt omitAbsentKeys)
 
 setupArgs() {
   opt -r out '' "Output table"

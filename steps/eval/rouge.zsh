@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Compute ROUGE-{1,2,L} scores"
-dependencies=("uc/eval/rouge.py")
-importantconfig=(fieldOutput fieldRef fieldInput)
+metaDepScripts=("uc/eval/rouge.py")
+metaDepOpts=(fieldOutput fieldRef fieldInput)
 
 setupArgs() {
   opt -r in '' "Input text"

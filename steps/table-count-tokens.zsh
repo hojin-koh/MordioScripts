@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Count how many tokens is in the specified field"
-dependencies=("uc/table-count-tokens.py")
-importantconfig=(fieldOutput fieldInput)
+metaDepScripts=("uc/table-count-tokens.py")
+metaDepOpts=(fieldOutput fieldInput)
 
 setupArgs() {
   opt -r in '' "Input table"

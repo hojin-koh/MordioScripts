@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Get all the dataset split spec for cross-validation"
-dependencies=("uc/dataset-cv-split.py")
-importantconfig=(nSplit)
+metaDepScripts=("uc/dataset-cv-split.py")
+metaDepOpts=(nSplit)
 
 setupArgs() {
   opt -r in '' "Input label table"

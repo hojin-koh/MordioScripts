@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Sort a table through other tables"
-dependencies=("uc/table-sort.py")
-importantconfig=(fieldSort doNumSort directionSort)
+metaDepScripts=("uc/table-sort.py")
+metaDepOpts=(fieldSort doNumSort directionSort)
 
 setupArgs() {
   opt -r out '' "Output table"

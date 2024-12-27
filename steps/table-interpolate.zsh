@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Merge counts or scores from 2nd column of multiple tables"
-dependencies=("uc/table-interpolate.py")
-importantconfig=(normalize w)
+metaDepScripts=("uc/table-interpolate.py")
+metaDepOpts=(normalize w)
 
 setupArgs() {
   opt -r out '' "Output table"

@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Train a BERT classifier"
-dependencies=("uc/llm/bertclass-train.py")
-importantconfig=(typeModel nameModel fieldLabel fieldInput)
+metaDepScripts=("uc/llm/bertclass-train.py")
+metaDepOpts=(typeModel nameModel fieldLabel fieldInput)
 
 setupArgs() {
   opt -r out '' "Output BERT"

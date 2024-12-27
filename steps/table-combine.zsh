@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Combine multiple tables to have all the columns"
-dependencies=("uc/table-combine.py")
-importantconfig=()
+metaDepScripts=("uc/table-combine.py")
+metaDepOpts=()
 
 setupArgs() {
   opt -r out '' "Output table"

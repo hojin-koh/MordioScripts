@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Compute BERT-scores"
-dependencies=("uc/eval/bertscore.py")
-importantconfig=(lang fieldOutput fieldRef fieldInput)
+metaDepScripts=("uc/eval/bertscore.py")
+metaDepOpts=(lang fieldOutput fieldRef fieldInput)
 
 setupArgs() {
   opt -r in '' "Input text"
