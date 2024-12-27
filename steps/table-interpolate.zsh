@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Merge counts or scores from multiple tables"
-dependencies=( "uc/table-interpolate.py" )
+dependencies=("uc/table-interpolate.py")
 importantconfig=(normalize w)
 
 setupArgs() {
@@ -28,6 +28,10 @@ setupArgs() {
 }
 
 main() {
+  if [[ $#w != $#in ]]; then
+    err 'Argument w and in should have same length' 15
+  fi
+
   local params="uc/table-interpolate.py"
   if [[ $normalize == true ]]; then
     params+=" --normalize"

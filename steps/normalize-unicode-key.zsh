@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Normalize unicode in the keys of a table"
-dependencies=( "uc/normalize-unicode.py" "uc/table-interpolate.py" ) # "uc/table-merge.py" 
+dependencies=("uc/normalize-unicode.py" "uc/table-interpolate.py") # "uc/table-merge.py" 
 importantconfig=(mode)
 
 setupArgs() {

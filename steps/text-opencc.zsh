@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Do kanji transformations with OpenCC"
-dependencies=( "uc/text-opencc.py" )
+dependencies=("uc/text-opencc.py")
 importantconfig=(config)
 
 setupArgs() {

@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Compute per-entry accuracy for classification"
-dependencies=( "uc/eval/acc-class.py" )
+dependencies=("uc/eval/acc-class.py")
+importantconfig=()
 
 setupArgs() {
   opt -r out '' "Output accuracy table"

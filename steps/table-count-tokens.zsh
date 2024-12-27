@@ -12,8 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Count how many tokens is in all fields except id"
-dependencies=( "uc/table-count-tokens.py" )
+description="Count how many tokens is in the second field"
+dependencies=("uc/table-count-tokens.py")
 importantconfig=(name)
 
 setupArgs() {

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Filter a table through other tables and a python expression"
-dependencies=( "uc/table-filter.py" )
+dependencies=("uc/table-filter.py")
 importantconfig=(filt nameKey omitAbsentKeys)
 
 setupArgs() {

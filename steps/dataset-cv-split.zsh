@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Get all the dataset split spec for cross-validation"
-dependencies=( "uc/dataset-cv-split.py" )
+dependencies=("uc/dataset-cv-split.py")
 importantconfig=(nSplit)
 
 setupArgs() {
@@ -34,6 +34,7 @@ main() {
     err "In this configuration, there must be exactly $nSplit output tables" 15
   fi
 
+  # TODO: faster, only 1 call
   for (( i=1; i<=$nSplit; i++ )); do
     in::load \
     | uc/dataset-cv-split.py "$nSplit" $[i-1] \

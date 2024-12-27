@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Train a BERT classifier"
-dependencies=( "uc/llm/bertclass-train.py" )
-importantconfig=( typeModel nameModel )
+dependencies=("uc/llm/bertclass-train.py")
+importantconfig=(typeModel nameModel)
 
 setupArgs() {
   opt -r out '' "Output BERT"

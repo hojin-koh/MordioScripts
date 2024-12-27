@@ -32,6 +32,10 @@ setupArgs() {
 }
 
 main() {
+  if [[ $#field != $#arith ]]; then
+    err 'Argument field and arith should have same length' 15
+  fi
+
   local param="$(in::getLoader) | uc/table-arith.py"
   if [[ $omitAbsentKeys == true ]]; then
     param+=" --omit-absent-keys"

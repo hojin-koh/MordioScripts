@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Predict output from a BERT-based model"
-dependencies=( "uc/llm/bertclass-predict.py" )
+dependencies=("uc/llm/bertclass-predict.py")
+importantconfig=(nbest)
 
 setupArgs() {
   opt -r out '' "Output result table"

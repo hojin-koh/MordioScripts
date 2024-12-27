@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Compute mean and bootstrapped 95% confidence interval for some statistics"
-dependencies=( "uc/eval/mean-boot.py" )
-importantconfig=(mode tag)
+dependencies=("uc/eval/mean-boot.py")
+importantconfig=(mode tag fields)
 
 setupArgs() {
   opt -r out '' "Output result table"
@@ -39,6 +39,9 @@ main() {
     | out::save
     if [[ $? != 0 ]]; then return 1; fi
   elif [[ $mode == mean ]]; then
+    if [[ $#in != $#tag ]]; then
+      err 'In mean mode, argument tag and in should have same length' 15
+    fi
     err "Not implemented yet" 15
     if [[ $? != 0 ]]; then return 1; fi
   fi

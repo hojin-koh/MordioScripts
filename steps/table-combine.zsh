@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Do arithmetics with fields with multiple tables"
+description="Combine multiple tables to have all the columns"
 dependencies=("uc/table-combine.py")
 importantconfig=(nameKey)
 

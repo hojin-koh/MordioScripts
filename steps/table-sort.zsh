@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Sort a table through other tables"
-dependencies=( "uc/table-sort.py" )
+dependencies=("uc/table-sort.py")
 importantconfig=(nameSortKey nameKey doNumSort directionSort)
 
 setupArgs() {

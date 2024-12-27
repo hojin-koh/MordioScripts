@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Normalize unicode in the text"
-dependencies=( "uc/normalize-unicode.py" )
+dependencies=("uc/normalize-unicode.py")
 importantconfig=()
 
 setupArgs() {
