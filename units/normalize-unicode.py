@@ -15,8 +15,8 @@
 # limitations under the License.
 
 # Based on a table of (bad character),(good character) records as argv[1],
-# Perform text normalization on text part of (id),(text) records (if sys.argv[2]=="text")
-# or key part of (key),(number) records from stdin (if sys.argv[2]=="key")
+# Perform text normalization on text part of (id),(text) records (if sys.argv[1]=="text")
+# or key part of (key),(number) records from stdin (if sys.argv[1]=="key")
 # Also will do unicodedata.normalize()
 
 import csv
@@ -32,36 +32,44 @@ def normalize(objTrans, text):
         )))
 
 def main():
+    modeConv = sys.argv.pop(1) # "text or key"
+    if modeConv == 'text':
+        fieldText = sys.argv.pop(1)
+
     mTrans = {}
     if len(sys.argv)>1:
         # Read the conversion table
-        with open(sys.argv[1], encoding='utf-8') as fp:
-            for row in csv.DictReader(fp):
-                mTrans[row['before']] = row['after']
+        with open(sys.argv.pop(1), encoding='utf-8') as fp:
+            objReader = csv.DictReader(fp)
+            fieldConv1 = objReader.fieldnames[0]
+            fieldConv2 = objReader.fieldnames[1]
+            for row in objReader:
+                mTrans[row[fieldConv1]] = row[fieldConv2]
     objTrans = str.maketrans(mTrans)
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
 
-    if sys.argv[2] == "text":
+    if modeConv == "text":
         objReader = csv.DictReader(sys.stdin)
-        nameKey = objReader.fieldnames[0]
-        nameText = objReader.fieldnames[1]
-        objWriter = csv.DictWriter(sys.stdout, (nameKey, nameText), lineterminator="\n")
+        fieldKey = objReader.fieldnames[0]
+        if len(fieldText) == 0:
+            fieldText = objReader.fieldnames[1]
+        objWriter = csv.DictWriter(sys.stdout, (fieldKey, fieldText), lineterminator="\n")
         objWriter.writeheader()
         for row in objReader:
-            key = row[nameKey]
-            text = normalize(objTrans, row[nameText].replace("\\n", "\n").strip())
-            objWriter.writerow({nameKey: key, nameText: text.replace("\n", "\\n")})
+            key = row[fieldKey]
+            text = normalize(objTrans, row[fieldText].replace("\\n", "\n").strip())
+            objWriter.writerow({fieldKey: key, fieldText: text.replace("\n", "\\n")})
             sys.stdout.flush()
 
-    elif sys.argv[2] == "key":
+    elif modeConv == "key":
         objReader = csv.DictReader(sys.stdin)
-        nameKey = objReader.fieldnames[0]
+        fieldKey = objReader.fieldnames[0]
         objWriter = csv.DictWriter(sys.stdout, objReader.fieldnames, lineterminator="\n")
         objWriter.writeheader()
         for row in objReader:
-            row[nameKey] = normalize(objTrans, row[nameKey])
+            row[fieldKey] = normalize(objTrans, row[fieldKey])
             objWriter.writerow(row)
             sys.stdout.flush()
 

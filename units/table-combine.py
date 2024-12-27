@@ -24,28 +24,30 @@ if sys.version_info < (3, 7):
     print("Error: minimum supported python version is 3.7 (for dict to preserve insertion order)", file=sys.stderr)
     sys.exit(37)
 
-def addToRecord(mRecord, mFields, nameKey, row):
+def addToRecord(mRecord, mFields, fieldKey, row):
     for field in mFields.keys():
-        if field == nameKey:
-            mRecord[nameKey] = row[nameKey]
+        if field == fieldKey:
+            mRecord[fieldKey] = row[fieldKey]
             continue
         mRecord[field] = row[field]
 
 def main():
-    nameKey = sys.argv[1]
+    fieldKey = None
 
     mData = {} # Use dict to preserve insertion order and to act as a set
     mFields = {} # Use dict to preserve insertion order and to act as a set
-    for fname in sys.argv[2:]:
+    for fname in sys.argv[1:]:
         with open(fname, encoding='utf-8') as fp:
             objReader = csv.DictReader(fp)
+            if fieldKey is None:
+                fieldKey = objReader.fieldnames[0]
             for field in objReader.fieldnames:
                 mFields[field] = True
             for row in objReader:
-                key = row[nameKey] # It should crash if nameKey is not present, which is exactly what we want here
+                key = row[fieldKey] # It should crash if fieldKey is not present, which is exactly what we want here
                 if key not in mData:
                     mData[key] = {}
-                addToRecord(mData[key], objReader.fieldnames, nameKey, row)
+                addToRecord(mData[key], objReader.fieldnames, fieldKey, row)
 
     sys.stdout.reconfigure(encoding='utf-8')
     objWriter = csv.DictWriter(sys.stdout, tuple(mFields.keys()), lineterminator="\n")

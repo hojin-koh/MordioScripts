@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Filter a table through other tables and a python expression"
 dependencies=("uc/table-filter.py")
-importantconfig=(filt nameKey omitAbsentKeys)
+importantconfig=(filt omitAbsentKeys)
 
 setupArgs() {
   opt -r out '' "Output table"
@@ -26,7 +26,6 @@ setupArgs() {
   optType infilt input table
 
   opt filt '1 == 1' "Filter expression in python, like record['grade'] >= 5 and record['ntoken'] < 3000"
-  opt nameKey 'id' "Name of the column containing keys for filtering"
   opt omitAbsentKeys true "Whether to omit keys from output that don't exist in filter tables"
 }
 
@@ -35,18 +34,18 @@ main() {
   if [[ $omitAbsentKeys == true ]]; then
     param+=" --omit-absent-keys"
   fi
-  param+=" '$nameKey' ${(q+)filt}"
+  param+=" ${(q+)filt}"
   
   local i
   for (( i=1; i<=$#infilt; i++ )); do
     param+=" <($(infilt::getLoader $i))"
   done
 
-  if out::isReal $i; then
-    eval "$param" | out::save $i
+  if out::isReal; then
+    eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   else
-    echo "$param" | out::save $i
+    echo "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   fi
 }

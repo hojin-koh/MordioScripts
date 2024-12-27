@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Normalize unicode in the text"
 dependencies=("uc/normalize-unicode.py")
-importantconfig=()
+importantconfig=(fieldInput)
 
 setupArgs() {
   opt -r out '' "Output text"
@@ -24,6 +24,8 @@ setupArgs() {
   optType in input table
   opt -r conv '' "Input character mapping table"
   optType conv input table
+
+  opt fieldInput '' "Name of input field. By default the second column"
 }
 
 main() {
@@ -34,7 +36,7 @@ main() {
   local nr
   getMeta in 0 nRecord nr
   in::load \
-  | uc/normalize-unicode.py <(conv::load) text \
+  | uc/normalize-unicode.py text "$fieldInput" <(conv::load) \
   | lineProgressBar $nr \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi

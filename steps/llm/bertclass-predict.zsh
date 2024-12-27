@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Predict output from a BERT-based model"
 dependencies=("uc/llm/bertclass-predict.py")
-importantconfig=(nbest)
+importantconfig=(nbest fieldOutput fieldInput)
 
 setupArgs() {
   opt -r out '' "Output result table"
@@ -26,6 +26,8 @@ setupArgs() {
   optType model input modeldir
 
   opt nbest 5 "Number of nbest to output"
+  opt fieldOutput 'pred' "Prefix of names of the field of the predictions in the resultant table"
+  opt fieldInput '' "Name of input field. By default the second column"
 }
 
 main() {
@@ -37,7 +39,7 @@ main() {
   getMeta in 1 nRecord nr
 
   in::load \
-  | uc/llm/bertclass-predict.py "$model" "$nbest" \
+  | uc/llm/bertclass-predict.py "$fieldOutput" "$fieldInput" "$model" "$nbest" \
   | lineProgressBar $nr \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi

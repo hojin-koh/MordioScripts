@@ -23,22 +23,25 @@ import sys
 from transformers import AutoTokenizer
 
 def main():
-    nameModel = sys.argv[1]
+    fieldOutput = sys.argv.pop(1)
+    fieldInput = sys.argv.pop(1)
+    nameModel = sys.argv.pop(1)
     objTok = AutoTokenizer.from_pretrained(nameModel, do_lower_case=False, clean_up_tokenization_spaces=False)
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    nameKey = objReader.fieldnames[0]
-    nameText = objReader.fieldnames[1]
-    objWriter = csv.DictWriter(sys.stdout, (nameKey, 'ntoken'), lineterminator="\n")
+    fieldKey = objReader.fieldnames[0]
+    if len(fieldInput) == 0:
+        fieldInput = objReader.fieldnames[1]
+    objWriter = csv.DictWriter(sys.stdout, (fieldKey, fieldOutput), lineterminator="\n")
     objWriter.writeheader()
 
     for row in objReader:
-        key = row[nameKey]
-        text = row[nameText].replace("\\n", "\n").strip()
+        key = row[fieldKey]
+        text = row[fieldInput].replace("\\n", "\n").strip()
         nTok = len(objTok.encode(text, padding=False, truncation=False))
-        objWriter.writerow({nameKey: key, 'ntoken': nTok})
+        objWriter.writerow({fieldKey: key, 'ntoken': nTok})
         sys.stdout.flush()
 
 if __name__ == '__main__':

@@ -21,10 +21,10 @@ import csv
 import re # Kept here for potential use in the expression
 import sys
 
-def addToRecord(mRecord, aFields, nameKey, row):
+def addToRecord(mRecord, aFields, fieldKey, row):
     for field in aFields:
-        if field == nameKey:
-            mRecord[nameKey] = row[nameKey]
+        if field == fieldKey:
+            mRecord[fieldKey] = row[fieldKey]
             continue
         if field not in mRecord:
             mRecord[field] = []
@@ -42,18 +42,20 @@ def main():
     if sys.argv[1] == '--omit-absent-keys':
         modeOmit = True
         sys.argv.pop(1)
-    nameKey = sys.argv[1]
-    exprFilter = sys.argv[2]
+    exprFilter = sys.argv.pop(1)
 
+    fieldKey = None
     mData = {}
-    for fname in (sys.argv[i] for i in range(3, len(sys.argv))):
+    for fname in (sys.argv[i] for i in range(1, len(sys.argv))):
         with open(fname, encoding='utf-8') as fp:
             objReader = csv.DictReader(fp)
+            if fieldKey is None:
+                fieldKey = objReader.fieldnames[0]
             for row in objReader:
-                key = row[nameKey] # It should crash if nameKey is not present, which is exactly what we want here
+                key = row[fieldKey] # It should crash if fieldKey is not present, which is exactly what we want here
                 if key not in mData:
                     mData[key] = {}
-                addToRecord(mData[key], objReader.fieldnames, nameKey, row)
+                addToRecord(mData[key], objReader.fieldnames, fieldKey, row)
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
@@ -61,7 +63,7 @@ def main():
     objWriter = csv.DictWriter(sys.stdout, objReader.fieldnames, lineterminator="\n")
     objWriter.writeheader()
     for row in objReader:
-        key = row[nameKey] # It will crash if nameKey is not present, which is exactly what we want here
+        key = row[fieldKey] # It will crash if fieldKey is not present, which is exactly what we want here
         if key not in mData:
             if not modeOmit:
                 objWriter.writerow(row)

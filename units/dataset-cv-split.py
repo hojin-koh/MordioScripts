@@ -25,24 +25,24 @@ import sys
 from sklearn.model_selection import StratifiedKFold, StratifiedGroupKFold
 
 def main():
-    nSplit = int(sys.argv[1])
-    idx = int(sys.argv[2])
+    nSplit = int(sys.argv.pop(1))
+    idx = int(sys.argv.pop(1))
 
     # TODO: implement the "group" part (will need some extra data input)
-    if len(sys.argv) >= 4:
+    if len(sys.argv) > 1:
         pass
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    nameKey = objReader.fieldnames[0]
-    nameLabel = objReader.fieldnames[1]
+    fieldKey = objReader.fieldnames[0]
+    fieldLabel = objReader.fieldnames[1]
 
     aOrder = []
     aLabel = []
     for row in objReader:
-        aOrder.append(row[nameKey])
-        aLabel.append(row[nameLabel])
+        aOrder.append(row[fieldKey])
+        aLabel.append(row[fieldLabel])
 
     #TODO objCV = StratifiedGroupKFold(n_splits=nSplit, shuffle=True, random_state=0x19890604)
     objCV = StratifiedKFold(n_splits=nSplit, shuffle=True, random_state=0x19890604)
@@ -56,14 +56,14 @@ def main():
     print('ID={} nSplit={} nTrain={} nTest={}'.format(idx, nSplit, len(sTrain), len(sTest)), file=sys.stderr)
 
     # Output
-    objWriter = csv.DictWriter(sys.stdout, (nameKey, 'set'), lineterminator="\n")
+    objWriter = csv.DictWriter(sys.stdout, (fieldKey, 'set'), lineterminator="\n")
     objWriter.writeheader()
 
     for i, key in enumerate(aOrder):
         if i in sTrain:
-            objWriter.writerow({nameKey: key, 'set': 'train'})
+            objWriter.writerow({fieldKey: key, 'set': 'train'})
         else:
-            objWriter.writerow({nameKey: key, 'set': 'test'})
+            objWriter.writerow({fieldKey: key, 'set': 'test'})
 
 if __name__ == '__main__':
     main()

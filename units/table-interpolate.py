@@ -31,7 +31,7 @@ def main():
     if sys.argv[1] == '--normalize':
         modeNormalize = True
         sys.argv.pop(1)
-    nameKey = ""
+    fieldKey = None
 
     isFloat = False
     aCnt = [] # Recording the total sum of each table
@@ -44,15 +44,15 @@ def main():
 
         with open(fname, encoding='utf-8') as fp:
             objReader = csv.DictReader(fp)
-            nameKey = objReader.fieldnames[0]
-            nameColumn = objReader.fieldnames[1]
+            fieldKey = objReader.fieldnames[0]
+            fieldValue = objReader.fieldnames[1]
 
             for row in objReader:
-                key = row[objReader.fieldnames[0]]
-                if nameColumn not in row:
-                    sys.stderr.write("Warning: entry {} has no column {}, skipped\n".format(key, nameColumn))
+                key = row[fieldKey]
+                if fieldValue not in row:
+                    sys.stderr.write("Warning: entry {} has no column {}, skipped\n".format(key, fieldValue))
                     continue
-                strVal = row[nameColumn]
+                strVal = row[fieldValue]
 
                 if strVal.find('.') != -1:
                     val = float(strVal.strip())
@@ -83,18 +83,18 @@ def main():
 
     # Configure output
     sys.stdout.reconfigure(encoding='utf-8')
-    objWriter = csv.DictWriter(sys.stdout, (nameKey, nameColumn), lineterminator="\n")
+    objWriter = csv.DictWriter(sys.stdout, (fieldKey, fieldValue), lineterminator="\n")
     objWriter.writeheader()
 
     # Output
     if isFloat:
         for k in mTable.keys():
             v = mTable[k]
-            objWriter.writerow({nameKey: k, nameColumn: v})
+            objWriter.writerow({fieldKey: k, fieldValue: v})
     else:
         for k in mTable.keys():
             v = mTable[k]
-            objWriter.writerow({nameKey: k, nameColumn: ceil(v)})
+            objWriter.writerow({fieldKey: k, fieldValue: ceil(v)})
 
 if __name__ == '__main__':
     main()

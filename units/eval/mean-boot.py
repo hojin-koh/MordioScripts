@@ -29,8 +29,9 @@ def meanWeighted(aSamples, aWeights):
     return np.average(aSamples, weights=aWeights)
 
 def main():
-    aFields = sys.argv[1].strip().split(',') if len(sys.argv[1]) > 0 else None
-    tagOutput = sys.argv[2]
+    aFields = sys.argv.[1].strip().split(',') if len(sys.argv[1]) > 0 else None
+    sys.argv.pop(1)
+    tagOutput = sys.argv.pop(1)
 
     if aFields is not None:
         maData = {field: [] for field in aFields}

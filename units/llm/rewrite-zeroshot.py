@@ -33,11 +33,11 @@ os.environ['VLLM_LOGGING_LEVEL'] = 'ERROR'
 from vllm import LLM, SamplingParams
 
 def main():
-    nameModel = sys.argv[1]
-    nameTokenizer = sys.argv[2]
-    lenContext = int(sys.argv[3])
-    fileConfig = sys.argv[4]
-    fileOutput = sys.argv[5]
+    nameModel = sys.argv.pop(1)
+    nameTokenizer = sys.argv.pop(1)
+    lenContext = int(sys.argv.pop(1))
+    fileConfig = sys.argv.pop(1)
+    fileOutput = sys.argv.pop(1)
     sizeBatch = 8
 
     # Load the prompts
@@ -85,11 +85,11 @@ def main():
 
     sys.stdin.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    nameKey = objReader.fieldnames[0]
-    nameText = objReader.fieldnames[1]
+    fieldKey = objReader.fieldnames[0]
+    fieldInput = objReader.fieldnames[1]
 
     with open(fileOutput, 'w', encoding='utf-8') as fpw:
-        objWriter = csv.DictWriter(fpw, (nameKey, nameText), lineterminator="\n")
+        objWriter = csv.DictWriter(fpw, (fieldKey, fieldInput), lineterminator="\n")
         objWriter.writeheader()
 
         def commitBatch(aKeys, aPrompts):
@@ -101,7 +101,7 @@ def main():
                 output = rslt.outputs[0].text
                 for s in aStop:
                     output = re.sub(F"{s}.*", "", output, flags=re.DOTALL)
-                objWriter.writerow({nameKey: aKeys[i], nameText: output.strip().replace("\n", "\\n")})
+                objWriter.writerow({fieldKey: aKeys[i], fieldInput: output.strip().replace("\n", "\\n")})
                 sys.stdout.flush()
             aKeys.clear()
             aPrompts.clear()
@@ -109,8 +109,8 @@ def main():
         aKeys = []
         aBatch = []
         for row in objReader:
-            eid = row[nameKey]
-            text = row[nameText].replace("\\n", "\n").strip()
+            eid = row[fieldKey]
+            text = row[fieldInput].replace("\\n", "\n").strip()
 
             aChat = []
             mEnv = {'text': text, 'length': len(text)}

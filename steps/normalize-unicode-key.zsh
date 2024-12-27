@@ -35,7 +35,7 @@ main() {
 
   # TODO: uc/table-merge.py --set
   in::load \
-  | uc/normalize-unicode.py <(conv::load) key \
+  | uc/normalize-unicode.py key <(conv::load) \
   | if [[ $mode == merge ]]; then err "Not implemented" 12; else uc/table-interpolate.py 1.0 /dev/stdin; fi \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi

@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Compute per-entry accuracy for classification"
 dependencies=("uc/eval/acc-class.py")
-importantconfig=()
+importantconfig=(fieldOutput fieldRef fieldInput)
 
 setupArgs() {
   opt -r out '' "Output accuracy table"
@@ -24,10 +24,14 @@ setupArgs() {
   optType in input table
   opt -r label '' "Input label table"
   optType label input table
+
+  opt fieldOutput 'acc' "Name of the field of the accuracy in the resultant table"
+  opt fieldRef '' "Name of reference field. By default the second column"
+  opt fieldInput '' "Name of input field. By default the second column"
 }
 
 main() {
-  local param="$(in::getLoader) | uc/eval/acc-class.py <($(label::getLoader))"
+  local param="$(in::getLoader) | uc/eval/acc-class.py ${(q+)fieldOutput} ${(q+)fieldRef} ${(q+)fieldInput} <($(label::getLoader))"
 
   if out::isReal; then
     eval "$param" | out::save

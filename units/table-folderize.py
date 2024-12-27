@@ -20,30 +20,30 @@ import csv
 import sys
 
 def main():
-    mode = sys.argv[1]
-    nameKey = sys.argv[2]
+    mode = sys.argv.pop(1)
+    fieldKey = None
 
     sys.stdout.reconfigure(encoding='utf-8')
     objWriter = None
 
-    while len(sys.argv) > 3:
-        tag = sys.argv[3]
-        fname = sys.argv[4]
-        sys.argv.pop(4)
-        sys.argv.pop(3)
+    while len(sys.argv) > 1:
+        tag = sys.argv.pop(1)
+        fname = sys.argv.pop(1)
         with open(fname, encoding='utf-8') as fp:
             objReader = csv.DictReader(fp)
             aFields = objReader.fieldnames
+            if fieldKey is None:
+                fieldKey = aFields[0]
             if not objWriter:
                 objWriter = csv.DictWriter(sys.stdout, aFields, lineterminator="\n")
                 objWriter.writeheader()
             for row in objReader:
-                key = row[nameKey]
+                key = row[fieldKey]
                 aRslt = row
                 if mode == 'prefix':
-                    aRslt[nameKey] = tag + key
+                    aRslt[fieldKey] = tag + key
                 else:
-                    aRslt[nameKey] = key + tag
+                    aRslt[fieldKey] = key + tag
                 objWriter.writerow(aRslt)
 
 if __name__ == '__main__':

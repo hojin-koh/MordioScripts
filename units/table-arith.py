@@ -21,10 +21,10 @@ import csv
 import re # Kept here for potential use in the expression
 import sys
 
-def addToRecord(mRecord, aFields, nameKey, row):
+def addToRecord(mRecord, aFields, fieldKey, row):
     for field in aFields:
-        if field == nameKey:
-            mRecord[nameKey] = row[nameKey]
+        if field == fieldKey:
+            mRecord[fieldKey] = row[fieldKey]
             continue
         if field not in mRecord:
             mRecord[field] = []
@@ -42,44 +42,48 @@ def main():
     if sys.argv[1] == '--omit-absent-keys':
         modeOmit = True
         sys.argv.pop(1)
-    nameKey = sys.argv[1]
+    fieldKey = None
 
     mData = {}
-    while len(sys.argv) > 2:
-        fname = sys.argv[2]
-        sys.argv.pop(2)
+    while len(sys.argv) > 1:
+        fname = sys.argv.pop(1)
         if fname == '--':
             break
         with open(fname, encoding='utf-8') as fp:
             objReader = csv.DictReader(fp)
+            if fieldKey is None:
+                fieldKey = objReader.fieldnames[0]
             for row in objReader:
-                key = row[nameKey] # It should crash if nameKey is not present, which is exactly what we want here
+                key = row[fieldKey] # It should crash if fieldKey is not present, which is exactly what we want here
                 if key not in mData:
                     mData[key] = {}
-                addToRecord(mData[key], objReader.fieldnames, nameKey, row)
+                addToRecord(mData[key], objReader.fieldnames, fieldKey, row)
 
     aField = []
     aArith = []
-    while len(sys.argv) > 2:
-        aField.append(sys.argv[2])
-        aArith.append(sys.argv[3])
-        sys.argv.pop(3)
-        sys.argv.pop(2)
+    while len(sys.argv) > 1:
+        aField.append(sys.argv.pop(1))
+        aArith.append(sys.argv.pop(1))
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    objWriter = csv.DictWriter(sys.stdout, (nameKey, *aField), lineterminator="\n")
+    objWriter = csv.DictWriter(sys.stdout, (fieldKey, *aField), lineterminator="\n")
     objWriter.writeheader()
     for row in objReader:
-        key = row[nameKey] # It will crash if nameKey is not present, which is exactly what we want here
+        key = row[fieldKey] # It will crash if fieldKey is not present, which is exactly what we want here
         if key not in mData:
             if modeOmit:
                 continue
-        data = mData[key] # It will crash if not modeOmit and key not in mData
-        mVal = {nameKey: key}
+        data = mData[key] # It will crash if not modeOmit and key not in mData, failing early and visibly
+        mVal = {fieldKey: key}
         for i in range(len(aField)):
-            mVal[aField[i]] = eval(aArith[i])
+            try:
+                mVal[aField[i]] = eval(aArith[i])
+            except Exception as e:
+                print(e, file=sys.stderr)
+                print(data, file=sys.stderr)
+                sldkjflksdjf
         objWriter.writerow(mVal)
 
 if __name__ == '__main__':

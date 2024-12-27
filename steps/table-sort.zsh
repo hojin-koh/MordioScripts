@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Sort a table through other tables"
 dependencies=("uc/table-sort.py")
-importantconfig=(nameSortKey nameKey doNumSort directionSort)
+importantconfig=(fieldSort doNumSort directionSort)
 
 setupArgs() {
   opt -r out '' "Output table"
@@ -24,9 +24,8 @@ setupArgs() {
   optType in input table
   opt -r inbase '()' "Data table"
   optType inbase input table
-  opt -r nameSortKey '' "Name of the key the sorting based on"
+  opt -r fieldSort '' "Name of the key the sorting based on"
 
-  opt nameKey 'id' "Name of the column containing keys for sorting"
   opt doNumSort false "Whether to do numeric sorting"
   opt directionSort 'asc' "Either desc or asc"
 }
@@ -40,18 +39,18 @@ main() {
   if [[ $doNumSort == true ]]; then
     param+=" --do-num-sort"
   fi
-  param+=" '$nameKey' '$nameSortKey' '$directionSort'"
+  param+=" ${(q+)fieldSort} ${(q+)directionSort}"
   
   local i
   for (( i=1; i<=$#inbase; i++ )); do
     param+=" <($(inbase::getLoader $i))"
   done
 
-  if out::isReal $i; then
-    eval "$param" | out::save $i
+  if out::isReal; then
+    eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   else
-    echo "$param" | out::save $i
+    echo "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   fi
 }

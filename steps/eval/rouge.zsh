@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Compute ROUGE-{1,2,L} scores"
 dependencies=("uc/eval/rouge.py")
-importantconfig=()
+importantconfig=(fieldOutput fieldRef fieldInput)
 
 setupArgs() {
   opt -r in '' "Input text"
@@ -23,6 +23,10 @@ setupArgs() {
   optType ref input table
   opt -r out '' "Output table"
   optType out output table
+
+  opt fieldOutput 'rs' "Prefix of names of the field of the scores in the resultant table"
+  opt fieldRef '' "Name of reference field. By default the second column"
+  opt fieldInput '' "Name of input field. By default the second column"
 }
 
 main() {
@@ -54,7 +58,7 @@ main() {
 }
 
 processSub() {
-  uc/eval/rouge.py <(ref::load)
+  uc/eval/rouge.py "$fieldOutput" "$fieldRef" "$fieldInput" <(ref::load)
 }
 
 source Mordio/mordio

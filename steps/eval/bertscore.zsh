@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Compute BERT-scores"
 dependencies=("uc/eval/bertscore.py")
-importantconfig=(lang)
+importantconfig=(lang fieldOutput fieldRef fieldInput)
 
 setupArgs() {
   opt -r in '' "Input text"
@@ -25,6 +25,9 @@ setupArgs() {
   optType out output table
 
   opt lang zh "Language tag"
+  opt fieldOutput 'bs' "Prefix of names of the field of the scores in the resultant table"
+  opt fieldRef '' "Name of reference field. By default the second column"
+  opt fieldInput '' "Name of input field. By default the second column"
 }
 
 main() {
@@ -36,7 +39,7 @@ main() {
   getMeta in 0 nRecord nr
 
   in::load \
-  | uc/eval/bertscore.py "$lang" <(ref::load) \
+  | uc/eval/bertscore.py "$fieldOutput" "$fieldRef" "$fieldInput" "$lang" <(ref::load) \
   | lineProgressBar $nr \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi

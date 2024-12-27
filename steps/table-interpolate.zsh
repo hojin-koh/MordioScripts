@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Merge counts or scores from multiple tables"
+description="Merge counts or scores from 2nd column of multiple tables"
 dependencies=("uc/table-interpolate.py")
 importantconfig=(normalize w)
 
@@ -32,21 +32,21 @@ main() {
     err 'Argument w and in should have same length' 15
   fi
 
-  local params="uc/table-interpolate.py"
+  local param="uc/table-interpolate.py"
   if [[ $normalize == true ]]; then
-    params+=" --normalize"
+    param+=" --normalize"
   fi
 
   local i
   for (( i=1; i<=$#in; i++ )); do
-    params+=" ${w[$i]-1.0} <($(in::getLoader $i))"
+    param+=" ${(q+)w[$i]-1.0} <($(in::getLoader $i))"
   done
 
   if out::isReal; then
-    eval "${params}" | out::save
+    eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   else
-    echo "${params}" | out::save
+    echo "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   fi
 }

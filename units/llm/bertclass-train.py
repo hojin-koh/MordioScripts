@@ -61,34 +61,38 @@ class DatasetTraining(torch.utils.data.Dataset):
         return rtn
 
 def main():
-    dirOutput = sys.argv[1]
+    fieldRef = sys.argv.pop(1)
+    fieldInput = sys.argv.pop(1)
 
-    typeModel = sys.argv[2] # BERT
-    nameModel = sys.argv[3] # google-bert/bert-base-multilingual-cased
+    dirOutput = sys.argv.pop(1)
+    typeModel = sys.argv.pop(1) # BERT
+    nameModel = sys.argv.pop(1) # google-bert/bert-base-multilingual-cased
 
-    fileLabel = sys.argv[4]
+    fileLabel = sys.argv.pop(1)
 
     mLabel = {}
 
     # Load and number the labels
     with open(fileLabel, 'r', encoding='utf-8') as fp:
         objReader = csv.DictReader(fp)
-        nameKey = objReader.fieldnames[0]
-        nameLabel = objReader.fieldnames[1]
+        fieldKey = objReader.fieldnames[0]
+        if len(fieldLabel) == 0:
+            nameLabel = objReader.fieldnames[1]
         for row in objReader:
-            mLabel[row[nameKey]] = row[nameLabel]
+            mLabel[row[fieldKey]] = row[nameLabel]
     mLabelToId = {l:i for i,l in enumerate(sorted(set(mLabel.values())))}
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    nameKey = objReader.fieldnames[0]
-    nameText = objReader.fieldnames[1]
+    fieldKey = objReader.fieldnames[0]
+    if len(fieldInput) == 0:
+        fieldInput = objReader.fieldnames[1]
 
     aDataTrainAll = []
     for row in objReader:
-        text = row[nameText].replace('\\n', '\n').strip()
-        idLabel = mLabelToId[mLabel[row[nameKey]]]
+        text = row[fieldInput].replace('\\n', '\n').strip()
+        idLabel = mLabelToId[mLabel[row[fieldKey]]]
         aDataTrainAll.append((text, idLabel))
 
     # 90% train, 10% valid

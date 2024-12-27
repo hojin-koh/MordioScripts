@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Train a BERT classifier"
 dependencies=("uc/llm/bertclass-train.py")
-importantconfig=(typeModel nameModel)
+importantconfig=(typeModel nameModel fieldLabel fieldInput)
 
 setupArgs() {
   opt -r out '' "Output BERT"
@@ -27,6 +27,8 @@ setupArgs() {
 
   opt typeModel "BERT" "type of HuggingFace Transformer model"
   opt nameModel "bert-base-chinese" "name of HuggingFace base model"
+  opt fieldLabel '' "Name of label field. By default the second column"
+  opt fieldInput '' "Name of input field. By default the second column"
 }
 
 main() {
@@ -34,7 +36,7 @@ main() {
   out::putDir outThis
 
   in::load \
-  | CUDA_VISIBLE_DEVICES=0 uc/llm/bertclass-train.py "$outThis" "$typeModel" "$nameModel" <(inLabel::load)
+  | CUDA_VISIBLE_DEVICES=0 uc/llm/bertclass-train.py "$fieldLabel" "$fieldInput" "$outThis" "$typeModel" "$nameModel" <(inLabel::load)
 }
 
 source Mordio/mordio

@@ -22,25 +22,31 @@ import sys
 from rouge_metric import PyRouge
 
 def main():
+    fieldOutput = sys.argv.pop(1)
+    fieldRef = sys.argv.pop(1)
+    fieldInput = sys.argv.pop(1)
+    fileRef = sys.argv.pop(1)
+
     objRouge = PyRouge(rouge_n=(1, 2), rouge_l=True)
-    fileRef = sys.argv[1]
 
     aTypes = ('rouge-1', 'rouge-2', 'rouge-l')
     mRef = {}
     with open(fileRef, "r", encoding='utf-8') as fp:
         objReader = csv.DictReader(fp)
-        nameKey = objReader.fieldnames[0]
-        nameRef = objReader.fieldnames[1]
+        fieldKey = objReader.fieldnames[0]
+        if len(fieldRef) == 0:
+            fieldRef = objReader.fieldnames[1]
         for row in objReader:
-            mRef[row[nameKey]] = row[nameRef].replace("\\n", "\n").strip()
+            mRef[row[fieldKey]] = row[fieldRef].replace("\\n", "\n").strip()
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    nameKey = objReader.fieldnames[0]
-    nameText = objReader.fieldnames[1]
-    aCols = [nameKey]
-    for typ in ('rs1', 'rs2', 'rsl'):
+    fieldKey = objReader.fieldnames[0]
+    if len(fieldInput) == 0:
+        fieldInput = objReader.fieldnames[1]
+    aCols = [fieldKey]
+    for typ in (F'{fieldOutput}1', F'{fieldOutput}2', F'{fieldOutput}l'):
         aCols.append(F'{typ}-p')
         aCols.append(F'{typ}-r')
         aCols.append(F'{typ}-f1')
@@ -48,12 +54,12 @@ def main():
     objWriter.writeheader()
 
     for row in objReader:
-        key = row[nameKey]
-        text = row[nameText].replace("\\n", "\n").strip()
+        key = row[fieldKey]
+        text = row[fieldInput].replace("\\n", "\n").strip()
         # The cursed brackets are because this library expects hyp to be in a list, and ref in a list of lists (to support multiple references)
         mRouge = objRouge.evaluate([text], [[mRef[key]]])
-        mRslt = {nameKey: key}
-        for typ, typLib in (('rs1', 'rouge-1'), ('rs2', 'rouge-2'), ('rsl', 'rouge-l')):
+        mRslt = {fieldKey: key}
+        for typ, typLib in ((F'{fieldOutput}1', 'rouge-1'), (F'{fieldOutput}2', 'rouge-2'), (F'{fieldOutput}l', 'rouge-l')):
             mRslt[F'{typ}-p'] = mRouge[typLib]['p']
             mRslt[F'{typ}-r'] = mRouge[typLib]['r']
             mRslt[F'{typ}-f1'] = mRouge[typLib]['f']

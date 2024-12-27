@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Get token count based on a HF model"
 dependencies=("uc/llm/text-count-hftok.py")
-importantconfig=(model)
+importantconfig=(model fieldOutput fieldInput)
 
 setupArgs() {
   opt -r out '' "Output count table"
@@ -24,6 +24,8 @@ setupArgs() {
   optType in input table
 
   opt model "unsloth/Llama-3.2-1B-Instruct" "name of HuggingFace tokenizer model, will be loaded with AutoTokenizer"
+  opt fieldOutput 'ntoken' "Name of the field of this count in the resultant table"
+  opt fieldInput '' "Name of input field. By default the second column"
 }
 
 main() {
@@ -35,7 +37,7 @@ main() {
   getMeta in 0 nRecord nr
 
   in::load \
-  | uc/llm/text-count-hftok.py "$model" \
+  | uc/llm/text-count-hftok.py "$fieldOutput" "$fieldInput" "$model" \
   | lineProgressBar $nr \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi

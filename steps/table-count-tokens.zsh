@@ -12,9 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Count how many tokens is in the second field"
+description="Count how many tokens is in the specified field"
 dependencies=("uc/table-count-tokens.py")
-importantconfig=(name)
+importantconfig=(fieldOutput fieldInput)
 
 setupArgs() {
   opt -r in '' "Input table"
@@ -22,11 +22,12 @@ setupArgs() {
   opt -r out '' "Output table"
   optType out output table
 
-  opt name 'ntoken' "Name of the field of this count in the resultant table"
+  opt fieldOutput 'ntoken' "Name of the field of this count in the resultant table"
+  opt fieldInput '' "Name of input field. By default the second column"
 }
 
 main() {
-  local param="$(in::getLoader) | uc/table-count-tokens.py '$name'"
+  local param="$(in::getLoader) | uc/table-count-tokens.py ${(q+)fieldOutput} ${(q+)fieldInput}"
   if out::isReal; then
     eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi

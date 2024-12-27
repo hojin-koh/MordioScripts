@@ -30,7 +30,7 @@ main() {
   info "Header: $header"
   info "ID conversion rule: $rule"
 
-  local param="echo '$header'; $(in::getLoader) | tail +2 | perl -CSAD -nle '$rule'"
+  local param="echo ${(q+)header}; $(in::getLoader) | tail +2 | perl -CSAD -nle ${(q+)rule}"
   if out::isReal; then
     eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi

@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Do kanji transformations with OpenCC"
 dependencies=("uc/text-opencc.py")
-importantconfig=(config)
+importantconfig=(config fields)
 
 setupArgs() {
   opt -r out '' "Output text"
@@ -24,6 +24,7 @@ setupArgs() {
   optType in input table
 
   opt config "s2twp.json" "config name for OpenCC"
+  opt fields '' "Which comma-separated fields to transform. By default it will be just 2nd field"
 }
 
 main() {
@@ -35,7 +36,7 @@ main() {
   getMeta in 0 nRecord nr
 
   in::load \
-  | uc/text-opencc.py "$config" \
+  | uc/text-opencc.py "$config" "$fields" \
   | lineProgressBar $nr \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi

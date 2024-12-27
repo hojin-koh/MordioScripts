@@ -22,31 +22,36 @@ import csv
 import sys
 
 def main():
-    fileLabel = sys.argv[1]
+    fieldOutput = sys.argv.pop(1)
+    fieldRef = sys.argv.pop(1)
+    fieldInput = sys.argv.pop(1)
+    fileLabel = sys.argv.pop(1)
 
     mLabel = {}
     with open(fileLabel, "r", encoding='utf-8') as fp:
         objReader = csv.DictReader(fp)
-        nameKey = objReader.fieldnames[0]
-        nameLabel = objReader.fieldnames[1]
+        fieldKey = objReader.fieldnames[0]
+        if len(fieldRef) == 0:
+            fieldRef = objReader.fieldnames[1]
         for row in objReader:
-            mLabel[row[nameKey]] = set(row[nameLabel].strip().split())
+            mLabel[row[fieldKey]] = set(row[fieldRef].strip().split())
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    nameKey = objReader.fieldnames[0]
-    namePred = objReader.fieldnames[1]
-    objWriter = csv.DictWriter(sys.stdout, (nameKey, 'acc'), lineterminator="\n")
+    fieldKey = objReader.fieldnames[0]
+    if len(fieldInput) == 0:
+        fieldInput = objReader.fieldnames[1]
+    objWriter = csv.DictWriter(sys.stdout, (fieldKey, fieldOutput), lineterminator="\n")
     objWriter.writeheader()
 
     for row in objReader:
-        key = row[nameKey]
-        if row[namePred] in mLabel[key]:
+        key = row[fieldKey]
+        if row[fieldInput] in mLabel[key]:
             acc = 1
         else:
             acc = 0
-        objWriter.writerow({nameKey: key, 'acc': acc})
+        objWriter.writerow({fieldKey: key, fieldOutput: acc})
 
 if __name__ == '__main__':
     main()

@@ -14,13 +14,15 @@
 # limitations under the License.
 description="Segment the text document into characters"
 dependencies=("uc/text-delete-nonnlp.pl")
-importantconfig=()
+importantconfig=(header)
 
 setupArgs() {
   opt -r in '' "Input text"
   optType in input table
   opt -r out '' "Output text"
   optType out output table
+
+  opt header '' "Optionally override the table header"
 }
 
 main() {
@@ -31,7 +33,11 @@ main() {
   local nr
   getMeta in 1 nRecord nr
   (
-    in::load | perl -ne 'print if $. == 1';
+    if [[ -n "$header" ]]; then
+      printf '%s\n' "$header"
+    else
+      in::load | perl -ne 'print if $. == 1'
+    fi
     in::load \
     | tail +2 \
     | uc/text-delete-nonnlp.pl \

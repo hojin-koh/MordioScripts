@@ -22,22 +22,24 @@ import sys
 import opencc
 
 def main():
-    nameConfig = sys.argv[1]
+    nameConfig = sys.argv.pop(1)
+    aFields = [field for field in sys.argv.pop(1).strip().split(',') if len(field) > 0]
     objConv = opencc.OpenCC(nameConfig)
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    nameKey = objReader.fieldnames[0]
-    nameText = objReader.fieldnames[1]
-    objWriter = csv.DictWriter(sys.stdout, (nameKey, nameText), lineterminator="\n")
+    if len(aFields) == 0:
+        aFields.append(objReader.fieldnames[1])
+    objWriter = csv.DictWriter(sys.stdout, objReader.fieldnames, lineterminator="\n")
     objWriter.writeheader()
 
     for row in objReader:
-        key = row[nameKey]
-        text = row[nameText].replace("\\n", "\n").strip()
-        textNew = objConv.convert(text).replace("\n", "\\n")
-        objWriter.writerow({nameKey: key, nameText: textNew})
+        for field in aFields:
+            text = row[field].replace("\\n", "\n").strip()
+            textNew = objConv.convert(text).replace("\n", "\\n")
+            row[field] = textNew
+        objWriter.writerow(row)
         sys.stdout.flush()
 
 if __name__ == '__main__':

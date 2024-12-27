@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Combine multiple tables to have all the columns"
 dependencies=("uc/table-combine.py")
-importantconfig=(nameKey)
+importantconfig=()
 
 setupArgs() {
   opt -r out '' "Output table"
@@ -22,12 +22,10 @@ setupArgs() {
 
   opt -r in '()' "Input tables"
   optType in input table
-
-  opt nameKey 'id' "Name of the column containing keys for filtering"
 }
 
 main() {
-  local param="uc/table-combine.py $nameKey"
+  local param="uc/table-combine.py"
 
   local i
   for (( i=1; i<=$#in; i++ )); do

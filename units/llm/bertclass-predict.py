@@ -25,8 +25,10 @@ import torch
 from transformers import pipeline
 
 def main():
-    dirModel = sys.argv[1]
-    nBest = int(sys.argv[2])
+    fieldOutput = sys.argv.pop(1)
+    fieldInput = sys.argv.pop(1)
+    dirModel = sys.argv.pop(1)
+    nBest = int(sys.argv.pop(1))
 
     # TODO may want to switch to energy-based ood detection later, with function_to_apply='none' to disable softmax
     try:
@@ -39,26 +41,27 @@ def main():
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    nameKey = objReader.fieldnames[0]
-    nameText = objReader.fieldnames[1]
+    fieldKey = objReader.fieldnames[0]
+    if len(fieldInput) == 0:
+        fieldInput = objReader.fieldnames[1]
 
-    aCols = [nameKey]
+    aCols = [fieldKey]
     for i in range(nBest):
-        aCols.append(F'pred{i+1}')
-        aCols.append(F'score{i+1}')
-    aCols.append('conf')
+        aCols.append(F'{fieldOutput}{i+1}')
+        aCols.append(F'{fieldOutput}{i+1}-score')
+    aCols.append(F'{fieldOutput}-conf')
     objWriter = csv.DictWriter(sys.stdout, aCols, lineterminator="\n")
     objWriter.writeheader()
 
     for row in objReader:
-        key = row[nameKey]
-        text = row[nameText].replace("\\n", "\n").strip()
+        key = row[fieldKey]
+        text = row[fieldInput].replace("\\n", "\n").strip()
         mRslt = objPipeline(text, top_k=None, padding=True, truncation=True)
         aOut = [(l['label'], l['score']) for l in mRslt]
-        mOutput = {nameKey: key, 'conf': aOut[0][1]}
+        mOutput = {fieldKey: key, F'{fieldOutput}-conf': aOut[0][1]}
         for i in range(nBest):
-            mOutput[F'pred{i+1}'] = aOut[i][0]
-            mOutput[F'score{i+1}'] = aOut[i][1]
+            mOutput[F'{fieldOutput}{i+1}'] = aOut[i][0]
+            mOutput[F'{fieldOutput}{i+1}-score'] = aOut[i][1]
         objWriter.writerow(mOutput)
         sys.stdout.flush()
         # TODO energy-based confidence score

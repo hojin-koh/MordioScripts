@@ -25,7 +25,7 @@ setupArgs() {
 
   opt -r mode '' "CV/mean"
   opt -r tag '()' "Tag used for each input file in mean mode, or the overall tag for CV mode"
-  opt fields '' "Comma-separated fields to be processed"
+  opt fields '' "Comma-separated fields to be processed, all of omitted"
 }
 
 main() {

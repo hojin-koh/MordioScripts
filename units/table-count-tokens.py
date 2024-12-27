@@ -14,26 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Count how many space-separated tokens are in the second field (whatever its name)
+# Count how many space-separated tokens are in the specified field or second field
 
 import csv
 import sys
 
 def main():
-    nameOutput = sys.argv[1]
+    fieldOutput = sys.argv.pop(1)
+    fieldInput = sys.argv.pop(1)
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    nameKey = objReader.fieldnames[0]
-    nameText = objReader.fieldnames[1]
-    objWriter = csv.DictWriter(sys.stdout, (nameKey, nameOutput), lineterminator="\n")
+    fieldKey = objReader.fieldnames[0]
+    if fieldInput == '':
+        fieldInput = objReader.fieldnames[1]
+    objWriter = csv.DictWriter(sys.stdout, (fieldKey, fieldOutput), lineterminator="\n")
     objWriter.writeheader()
 
     for row in objReader:
-        key = row[nameKey]
-        cnt = len(row[nameText].replace("\\n", "\n").strip().split())
-        objWriter.writerow({nameKey: key, nameOutput: cnt})
+        key = row[fieldKey]
+        cnt = len(row[fieldInput].replace("\\n", "\n").strip().split())
+        objWriter.writerow({fieldKey: key, fieldOutput: cnt})
 
 if __name__ == '__main__':
     main()

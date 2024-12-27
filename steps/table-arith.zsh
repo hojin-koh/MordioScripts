@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Do arithmetics with fields with multiple tables"
 dependencies=("uc/table-arith.py")
-importantconfig=(nameKey omitAbsentKeys field arith)
+importantconfig=(omitAbsentKeys field arith)
 
 setupArgs() {
   opt -r out '' "Output table"
@@ -27,7 +27,6 @@ setupArgs() {
 
   opt -r field '()' "Name of output fields"
   opt -r arith '()' "Python arithemetic expression, like data['grade'][0] + max(data['ntoken'])"
-  opt nameKey 'id' "Name of the column containing keys for filtering"
   opt omitAbsentKeys true "Whether to silently omit keys from output that don't exist in data tables"
 }
 
@@ -40,7 +39,6 @@ main() {
   if [[ $omitAbsentKeys == true ]]; then
     param+=" --omit-absent-keys"
   fi
-  param+=" $nameKey"
 
   local i
   for (( i=1; i<=$#indata; i++ )); do
@@ -52,11 +50,11 @@ main() {
     param+=" ${(q+)field[$i]} ${(q+)arith[$i]}"
   done
 
-  if out::isReal $i; then
-    eval "$param" | out::save $i
+  if out::isReal; then
+    eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   else
-    echo "$param" | out::save $i
+    echo "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   fi
 }

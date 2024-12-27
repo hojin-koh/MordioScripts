@@ -22,31 +22,36 @@ import sys
 from bert_score import BERTScorer
 
 def main():
-    objBERTScore = BERTScorer(lang=sys.argv[1], rescale_with_baseline=False)
-    fileRef = sys.argv[2]
+    fieldOutput = sys.argv.pop(1)
+    fieldRef = sys.argv.pop(1)
+    fieldInput = sys.argv.pop(1)
+    objBERTScore = BERTScorer(lang=sys.argv.pop(1), rescale_with_baseline=False)
+    fileRef = sys.argv.pop(1)
 
     mRef = {}
     with open(fileRef, "r", encoding='utf-8') as fp:
         objReader = csv.DictReader(fp)
-        nameKey = objReader.fieldnames[0]
-        nameRef = objReader.fieldnames[1]
+        fieldKey = objReader.fieldnames[0]
+        if len(fieldRef) == 0:
+            fieldRef = objReader.fieldnames[1]
         for row in objReader:
-            mRef[row[nameKey]] = row[nameRef].replace("\\n", "\n").strip()
+            mRef[row[fieldKey]] = row[fieldRef].replace("\\n", "\n").strip()
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    nameKey = objReader.fieldnames[0]
-    nameText = objReader.fieldnames[1]
-    objWriter = csv.DictWriter(sys.stdout, (nameKey, 'bs-p', 'bs-r', 'bs-f1'), lineterminator="\n")
+    fieldKey = objReader.fieldnames[0]
+    if len(fieldInput) == 0:
+        fieldInput = objReader.fieldnames[1]
+    objWriter = csv.DictWriter(sys.stdout, (fieldKey, F'{fieldOutput}-p', F'{fieldOutput}-r', F'{fieldOutput}-f1'), lineterminator="\n")
     objWriter.writeheader()
 
     for row in objReader:
-        key = row[nameKey]
-        text = row[nameText].replace("\\n", "\n").strip()
+        key = row[fieldKey]
+        text = row[fieldInput].replace("\\n", "\n").strip()
         # The cursed brackets are because this library expects hyp to be in a list, and ref in a list of lists (to support multiple references)
         p, r, f = objBERTScore.score([text], [[mRef[key]]])
-        objWriter.writerow({nameKey: key, 'bs-p': p.item(), 'bs-r': r.item(), 'bs-f1': f.item()})
+        objWriter.writerow({fieldKey: key, F'{fieldOutput}-p': p.item(), F'{fieldOutput}-r': r.item(), F'{fieldOutput}-f1': f.item()})
         sys.stdout.flush()
 
 if __name__ == '__main__':

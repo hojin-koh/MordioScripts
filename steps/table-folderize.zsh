@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Folderize multiple tables into one table by prefixing/postfixing tag"
 dependencies=("uc/table-folderize.py")
-importantconfig=(tag nameKey mode)
+importantconfig=(tag mode)
 
 setupArgs() {
   opt -r out '' "Output table"
@@ -24,7 +24,6 @@ setupArgs() {
   opt -r in '()' "Input tables"
   optType in input table
 
-  opt nameKey 'id' "Name of the column containing keys for filtering"
   opt mode 'prefix' "prefix/postfix"
 }
 
@@ -33,17 +32,17 @@ main() {
     err 'Argument tag and in should have same length' 15
   fi
 
-  local param="uc/table-folderize.py ${(q+)mode} ${(q+)nameKey}"
+  local param="uc/table-folderize.py ${(q+)mode}"
   local i
   for (( i=1; i<=$#tag; i++ )); do
     param+=" ${(q+)tag[$i]} <($(in::getLoader $i))"
   done
 
-  if out::isReal $i; then
-    eval "$param" | out::save $i
+  if out::isReal; then
+    eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   else
-    echo "$param" | out::save $i
+    echo "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi
   fi
 }

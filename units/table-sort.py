@@ -25,16 +25,18 @@ def main():
         modeNumSort = True
         sys.argv.pop(1)
 
-    nameKey = sys.argv[1]
-    nameSortKey = sys.argv[2]
-    directionSort = sys.argv[3]
+    fieldKey = None
+    fieldSort = sys.argv.pop(1)
+    directionSort = sys.argv.pop(1)
 
     mTable = {}
-    for fname in (sys.argv[i] for i in range(4, len(sys.argv))):
+    for fname in (sys.argv[i] for i in range(1, len(sys.argv))):
         with open(fname, encoding='utf-8') as fp:
             objReader = csv.DictReader(fp)
+            if fieldKey is None:
+                fieldKey = objReader.fieldnames[0]
             for row in objReader:
-                key = row[nameKey] # It will crash if nameKey is not present, which is exactly what we want here
+                key = row[fieldKey] # It will crash if fieldKey is not present, which is exactly what we want here
                 mTable[key] = mTable.get(key, {}) | row
 
     sys.stdin.reconfigure(encoding='utf-8')
@@ -45,13 +47,13 @@ def main():
 
     aTarget = []
     for row in objReader:
-        key = row[nameKey] # It will crash if nameKey is not present, which is exactly what we want here
+        key = row[fieldKey] # It will crash if fieldKey is not present, which is exactly what we want here
         if key not in mTable:
             continue
         aTarget.append(row)
 
     aTarget.sort(
-            key=lambda m: float(mTable[m[nameKey]][nameSortKey]) if modeNumSort else m[nameSortKey],
+            key=lambda m: float(mTable[m[fieldKey]][fieldSort]) if modeNumSort else m[fieldSort],
             reverse=False if directionSort == 'asc' else True,
             )
     for row in aTarget:
