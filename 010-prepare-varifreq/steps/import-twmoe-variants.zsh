@@ -13,8 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Import twmoe variants table from https://github.com/kcwu/moedict-variants"
-# Backup: https://web.archive.org/web/20240602054933/https://raw.githubusercontent.com/kcwu/moedict-variants/master/list.txt
-dependencies=( "us/parse-variants-confusables.py" )
+dependencies=("us/parse-variants-confusables.py")
 importantconfig=()
 
 setupArgs() {
@@ -30,11 +29,12 @@ setupArgs() {
 main() {
   if [[ ! -f "$in" ]]; then
     info "Downloading the variants data from github.com ..."
+    # Backup: https://web.archive.org/web/20240602054933/https://raw.githubusercontent.com/kcwu/moedict-variants/master/list.txt
     curl -L -o "$in" 'https://raw.githubusercontent.com/kcwu/moedict-variants/master/list.txt'
   fi
 
   if [[ ! -f "$confusable" ]]; then
-    info "Downloading the ICU confusable data 2024-04-12 from github.com ..."
+    info "Downloading the ICU confusable data 2024-08-20 from github.com ..."
     curl -L -o "$confusable" 'https://github.com/unicode-org/icu/raw/51e21af692e95737ad8f75fdf2dbf105fe5811b0/icu4c/source/data/unidata/confusables.txt'
   fi
 

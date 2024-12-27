@@ -25,8 +25,8 @@ setupArgs() {
 main() {
   if [[ ! -f "$in" ]]; then
     info "Downloading the data from gist ..."
-    curl -L -o "$in" 'https://gist.github.com/gugod/4361804/raw/7fea308a3990d6ff72ad9337f5763ec6016a6394/ly-gazette-character-frequency.tsv'
     # Backup: https://web.archive.org/web/20241207030627/https://gist.githubusercontent.com/gugod/4361804/raw/7fea308a3990d6ff72ad9337f5763ec6016a6394/ly-gazette-character-frequency.tsv
+    curl -L -o "$in" 'https://gist.github.com/gugod/4361804/raw/7fea308a3990d6ff72ad9337f5763ec6016a6394/ly-gazette-character-frequency.tsv'
   fi
 
   if ! out::isReal; then

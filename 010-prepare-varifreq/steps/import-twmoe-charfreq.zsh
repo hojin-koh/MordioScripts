@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 description="Import twmoe character frequency table from https://language.moe.gov.tw/001/Upload/files/SITE_CONTENT/M0001/PRIMARY/shrest2-2.htm"
-dependencies=( "us/parse-twmoe-charfreq.py" )
+dependencies=("us/parse-twmoe-charfreq.py")
 importantconfig=()
 
 setupArgs() {
@@ -25,6 +25,7 @@ setupArgs() {
 main() {
   if [[ ! -f "$in" ]]; then
     info "Downloading the data from language.moe.gov.tw ..."
+    # Backup: https://mega.nz/file/rzQDDZIQ#Q2PHxowgWt0oHPn2UPP8vGjPx-PHl8gWoz3AR2mMBck
     curl -L -o "$in" 'https://language.moe.gov.tw/001/Upload/files/SITE_CONTENT/M0001/PRIMARY/download/shrest2.zip'
   fi
 
