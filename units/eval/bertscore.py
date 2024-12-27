@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Extract several word-based and char-based features for readability
+# Calculate BERTScore based on a reference text
 
 import csv
 import sys
@@ -47,6 +47,7 @@ def main():
         # The cursed brackets are because this library expects hyp to be in a list, and ref in a list of lists (to support multiple references)
         p, r, f = objBERTScore.score([text], [[mRef[key]]])
         objWriter.writerow({nameKey: key, 'bs-p': p.item(), 'bs-r': r.item(), 'bs-f1': f.item()})
+        sys.stdout.flush()
 
 if __name__ == '__main__':
     main()

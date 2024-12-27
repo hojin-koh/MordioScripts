@@ -39,6 +39,7 @@ def main():
         text = row[nameText].replace("\\n", "\n").strip()
         nTok = len(objTok.encode(text, padding=False, truncation=False))
         objWriter.writerow({nameKey: key, 'ntoken': nTok})
+        sys.stdout.flush()
 
 if __name__ == '__main__':
     main()

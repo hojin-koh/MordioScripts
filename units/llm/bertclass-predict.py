@@ -60,6 +60,7 @@ def main():
             mOutput[F'pred{i+1}'] = aOut[i][0]
             mOutput[F'score{i+1}'] = aOut[i][1]
         objWriter.writerow(mOutput)
+        sys.stdout.flush()
         # TODO energy-based confidence score
         #energy = torch.sigmoid(torch.logsumexp(torch.tensor(tuple(l['score'] for l in mRslt)), dim=0))
 

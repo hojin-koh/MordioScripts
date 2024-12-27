@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Count how many space-separated tokens are in the second field (whatever its name)
+# Do chinese text conversion with OpenCC
 
 import csv
 import sys
@@ -38,6 +38,7 @@ def main():
         text = row[nameText].replace("\\n", "\n").strip()
         textNew = objConv.convert(text).replace("\n", "\\n")
         objWriter.writerow({nameKey: key, nameText: textNew})
+        sys.stdout.flush()
 
 if __name__ == '__main__':
     main()

@@ -17,7 +17,6 @@
 # Count how many space-separated tokens are in the second field (whatever its name)
 
 import csv
-import re
 import sys
 
 def main():

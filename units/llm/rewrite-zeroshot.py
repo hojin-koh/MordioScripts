@@ -102,6 +102,7 @@ def main():
                 for s in aStop:
                     output = re.sub(F"{s}.*", "", output, flags=re.DOTALL)
                 objWriter.writerow({nameKey: aKeys[i], nameText: output.strip().replace("\n", "\\n")})
+                sys.stdout.flush()
             aKeys.clear()
             aPrompts.clear()
 

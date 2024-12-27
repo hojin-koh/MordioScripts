@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Extract several word-based and char-based features for readability
+# Compute Rouge-1, Rouge-2, and Rouge-L metrics based on a reference text
 
 import csv
 import sys

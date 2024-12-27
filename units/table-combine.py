@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Based on a series of tables containing data regarding the keys
-# Do arithematic and output some new values
+# Combine multiple tables, stacking the columns together
+# Assumes each table contains the same set of keys
 
 import csv
 import sys

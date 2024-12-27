@@ -14,21 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Based on a series of tables containing data regarding the keys
-# Perform sorting on the input table
+# Sort the table based on a certain column
 
 import csv
-import re
 import sys
-import unicodedata
-
-def normalize(objTrans, text):
-    # Only normalize the "letter" parts, not punctuations
-    return "".join(list(map(
-        lambda c: unicodedata.normalize('NFKC', c).translate(objTrans)
-        if unicodedata.category(c)[0] == 'L' else c,
-        text
-        )))
 
 def main():
     modeNumSort = False

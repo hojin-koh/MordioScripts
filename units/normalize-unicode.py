@@ -20,7 +20,6 @@
 # Also will do unicodedata.normalize()
 
 import csv
-import re
 import sys
 import unicodedata
 
@@ -54,6 +53,7 @@ def main():
             key = row[nameKey]
             text = normalize(objTrans, row[nameText].replace("\\n", "\n").strip())
             objWriter.writerow({nameKey: key, nameText: text.replace("\n", "\\n")})
+            sys.stdout.flush()
 
     elif sys.argv[2] == "key":
         objReader = csv.DictReader(sys.stdin)
@@ -63,6 +63,7 @@ def main():
         for row in objReader:
             row[nameKey] = normalize(objTrans, row[nameKey])
             objWriter.writerow(row)
+            sys.stdout.flush()
 
 if __name__ == '__main__':
     main()
