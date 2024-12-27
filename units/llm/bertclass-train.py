@@ -61,8 +61,8 @@ class DatasetTraining(torch.utils.data.Dataset):
         return rtn
 
 def main():
-    fieldRef = sys.argv.pop(1)
-    fieldInput = sys.argv.pop(1)
+    fieldRef = os.environ.get('MORDIOSCRIPTS_FIELD_LABEL', '')
+    fieldInput = os.environ.get('MORDIOSCRIPTS_FIELD_TEXT', '')
 
     dirOutput = sys.argv.pop(1)
     typeModel = sys.argv.pop(1) # BERT
@@ -76,7 +76,7 @@ def main():
     with open(fileLabel, 'r', encoding='utf-8') as fp:
         objReader = csv.DictReader(fp)
         fieldKey = objReader.fieldnames[0]
-        if len(fieldLabel) == 0:
+        if not fieldLabel:
             nameLabel = objReader.fieldnames[1]
         for row in objReader:
             mLabel[row[fieldKey]] = row[nameLabel]
@@ -86,7 +86,7 @@ def main():
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
     fieldKey = objReader.fieldnames[0]
-    if len(fieldInput) == 0:
+    if not fieldInput:
         fieldInput = objReader.fieldnames[1]
 
     aDataTrainAll = []

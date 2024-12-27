@@ -18,6 +18,7 @@
 # Usage: bertclass-predict.py <model>
 
 import csv
+import os
 import sys
 
 import torch
@@ -25,8 +26,8 @@ import torch
 from transformers import pipeline
 
 def main():
-    fieldOutput = sys.argv.pop(1)
-    fieldInput = sys.argv.pop(1)
+    fieldOutput = os.environ.get('MORDIOSCRIPTS_FIELD_OUTPUT', 'pred')
+    fieldInput = os.environ.get('MORDIOSCRIPTS_FIELD_TEXT', '')
     dirModel = sys.argv.pop(1)
     nBest = int(sys.argv.pop(1))
 
@@ -42,7 +43,7 @@ def main():
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
     fieldKey = objReader.fieldnames[0]
-    if len(fieldInput) == 0:
+    if not fieldInput:
         fieldInput = objReader.fieldnames[1]
 
     aCols = [fieldKey]

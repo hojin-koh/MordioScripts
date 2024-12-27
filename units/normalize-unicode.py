@@ -20,6 +20,7 @@
 # Also will do unicodedata.normalize()
 
 import csv
+import os
 import sys
 import unicodedata
 
@@ -34,7 +35,7 @@ def normalize(objTrans, text):
 def main():
     modeConv = sys.argv.pop(1) # "text or key"
     if modeConv == 'text':
-        fieldText = sys.argv.pop(1)
+        fieldText = os.environ.get('MORDIOSCRIPTS_FIELD_INPUT', '')
 
     mTrans = {}
     if len(sys.argv)>1:
@@ -53,7 +54,7 @@ def main():
     if modeConv == "text":
         objReader = csv.DictReader(sys.stdin)
         fieldKey = objReader.fieldnames[0]
-        if len(fieldText) == 0:
+        if not fieldText:
             fieldText = objReader.fieldnames[1]
         objWriter = csv.DictWriter(sys.stdout, (fieldKey, fieldText), lineterminator="\n")
         objWriter.writeheader()

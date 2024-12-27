@@ -59,16 +59,16 @@ def main():
                     mData[key] = {}
                 addToRecord(mData[key], objReader.fieldnames, fieldKey, row)
 
-    aField = []
-    aArith = []
+    aFields = []
+    aExprs = []
     while len(sys.argv) > 1:
-        aField.append(sys.argv.pop(1))
-        aArith.append(sys.argv.pop(1))
+        aFields.append(sys.argv.pop(1))
+        aExprs.append(sys.argv.pop(1))
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
-    objWriter = csv.DictWriter(sys.stdout, (fieldKey, *aField), lineterminator="\n")
+    objWriter = csv.DictWriter(sys.stdout, (fieldKey, *aFields), lineterminator="\n")
     objWriter.writeheader()
     for row in objReader:
         key = row[fieldKey] # It will crash if fieldKey is not present, which is exactly what we want here
@@ -77,9 +77,9 @@ def main():
                 continue
         data = mData[key] # It will crash if not modeOmit and key not in mData, failing early and visibly
         mVal = {fieldKey: key}
-        for i in range(len(aField)):
+        for i in range(len(aFields)):
             try:
-                mVal[aField[i]] = eval(aArith[i])
+                mVal[aFields[i]] = eval(aExprs[i])
             except Exception as e:
                 print(e, file=sys.stderr)
                 print(data, file=sys.stderr)

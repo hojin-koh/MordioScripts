@@ -27,7 +27,9 @@ setupArgs() {
 }
 
 main() {
-  local param="$(in::getLoader) | uc/table-count-tokens.py ${(q+)fieldOutput} ${(q+)fieldInput}"
+  local varFields="MORDIOSCRIPTS_FIELD_OUTPUT=${(q+)fieldOutput} "
+  varFields+="MORDIOSCRIPTS_FIELD_INPUT=${(q+)fieldInput} "
+  local param="$(in::getLoader) | $varFields uc/table-count-tokens.py"
   if out::isReal; then
     eval "$param" | out::save
     if [[ $? != 0 ]]; then return 1; fi

@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Compute per-entry accuracy for classification"
 metaDepScripts=("uc/eval/acc-class.py")
-metaDepOpts=(fieldOutput fieldRef fieldInput)
+metaDepOpts=(fieldOutput fieldLabel fieldInput)
 
 setupArgs() {
   opt -r out '' "Output accuracy table"
@@ -26,12 +26,15 @@ setupArgs() {
   optType label input table
 
   opt fieldOutput 'acc' "Name of the field of the accuracy in the resultant table"
-  opt fieldRef '' "Name of reference field. By default the second column"
+  opt fieldLabel '' "Name of reference field. By default the second column"
   opt fieldInput '' "Name of input field. By default the second column"
 }
 
 main() {
-  local param="$(in::getLoader) | uc/eval/acc-class.py ${(q+)fieldOutput} ${(q+)fieldRef} ${(q+)fieldInput} <($(label::getLoader))"
+  local varFields="MORDIOSCRIPTS_FIELD_OUTPUT=${(q+)fieldOutput} "
+  varFields+="MORDIOSCRIPTS_FIELD_LABEL=${(q+)fieldLabel} "
+  varFields+="MORDIOSCRIPTS_FIELD_INPUT=${(q+)fieldInput} "
+  local param+="$(in::getLoader) | $varFields uc/eval/acc-class.py <($(label::getLoader))"
 
   if out::isReal; then
     eval "$param" | out::save

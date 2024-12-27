@@ -18,13 +18,14 @@
 # Usage: text-count-hftok.py <model>
 
 import csv
+import os
 import sys
 
 from transformers import AutoTokenizer
 
 def main():
-    fieldOutput = sys.argv.pop(1)
-    fieldInput = sys.argv.pop(1)
+    fieldOutput = os.environ.get('MORDIOSCRIPTS_FIELD_OUTPUT', 'ntoken')
+    fieldInput = os.environ.get('MORDIOSCRIPTS_FIELD_TEXT', '')
     nameModel = sys.argv.pop(1)
     objTok = AutoTokenizer.from_pretrained(nameModel, do_lower_case=False, clean_up_tokenization_spaces=False)
 
@@ -32,7 +33,7 @@ def main():
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
     fieldKey = objReader.fieldnames[0]
-    if len(fieldInput) == 0:
+    if not fieldInput:
         fieldInput = objReader.fieldnames[1]
     objWriter = csv.DictWriter(sys.stdout, (fieldKey, fieldOutput), lineterminator="\n")
     objWriter.writeheader()

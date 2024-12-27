@@ -36,7 +36,10 @@ main() {
   out::putDir outThis
 
   in::load \
-  | CUDA_VISIBLE_DEVICES=0 uc/llm/bertclass-train.py "$fieldLabel" "$fieldInput" "$outThis" "$typeModel" "$nameModel" <(inLabel::load)
+  | CUDA_VISIBLE_DEVICES=0 \
+    MORDIOSCRIPTS_FIELD_INPUT=$fieldInput \
+    MORDIOSCRIPTS_FIELD_LABEL=$fieldLabel \
+    uc/llm/bertclass-train.py "$outThis" "$typeModel" "$nameModel" <(inLabel::load)
 }
 
 source Mordio/mordio

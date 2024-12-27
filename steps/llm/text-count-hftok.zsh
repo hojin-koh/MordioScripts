@@ -37,7 +37,9 @@ main() {
   getMeta in 0 nRecord nr
 
   in::load \
-  | uc/llm/text-count-hftok.py "$fieldOutput" "$fieldInput" "$model" \
+  | MORDIOSCRIPTS_FIELD_INPUT=$fieldInput \
+    MORDIOSCRIPTS_FIELD_OUTPUT=$fieldOutput \
+    uc/llm/text-count-hftok.py "$model" \
   | lineProgressBar $nr \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi

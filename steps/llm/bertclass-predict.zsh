@@ -39,7 +39,9 @@ main() {
   getMeta in 1 nRecord nr
 
   in::load \
-  | uc/llm/bertclass-predict.py "$fieldOutput" "$fieldInput" "$model" "$nbest" \
+  | MORDIOSCRIPTS_FIELD_OUTPUT=$fieldOutput \
+    MORDIOSCRIPTS_FIELD_INPUT=$fieldInput \
+    uc/llm/bertclass-predict.py "$model" "$nbest" \
   | lineProgressBar $nr \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi

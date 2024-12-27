@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Compute ROUGE-{1,2,L} scores"
 metaDepScripts=("uc/eval/rouge.py")
-metaDepOpts=(fieldOutput fieldRef fieldInput)
+metaDepOpts=(fieldOutput fieldLabel fieldInput)
 
 setupArgs() {
   opt -r in '' "Input text"
@@ -25,7 +25,7 @@ setupArgs() {
   optType out output table
 
   opt fieldOutput 'rs' "Prefix of names of the field of the scores in the resultant table"
-  opt fieldRef '' "Name of reference field. By default the second column"
+  opt fieldLabel '' "Name of reference field. By default the second column"
   opt fieldInput '' "Name of input field. By default the second column"
 }
 
@@ -58,7 +58,10 @@ main() {
 }
 
 processSub() {
-  uc/eval/rouge.py "$fieldOutput" "$fieldRef" "$fieldInput" <(ref::load)
+  MORDIOSCRIPTS_FIELD_OUTPUT=$fieldOutput \
+  MORDIOSCRIPTS_FIELD_LABEL=$fieldLabel \
+  MORDIOSCRIPTS_FIELD_INPUT=$fieldInput \
+  uc/eval/rouge.py <(ref::load)
 }
 
 source Mordio/mordio

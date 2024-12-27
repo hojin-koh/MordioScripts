@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Compute BERT-scores"
 metaDepScripts=("uc/eval/bertscore.py")
-metaDepOpts=(lang fieldOutput fieldRef fieldInput)
+metaDepOpts=(lang fieldOutput fieldLabel fieldInput)
 
 setupArgs() {
   opt -r in '' "Input text"
@@ -26,7 +26,7 @@ setupArgs() {
 
   opt lang zh "Language tag"
   opt fieldOutput 'bs' "Prefix of names of the field of the scores in the resultant table"
-  opt fieldRef '' "Name of reference field. By default the second column"
+  opt fieldLabel '' "Name of reference field. By default the second column"
   opt fieldInput '' "Name of input field. By default the second column"
 }
 
@@ -39,7 +39,10 @@ main() {
   getMeta in 0 nRecord nr
 
   in::load \
-  | uc/eval/bertscore.py "$fieldOutput" "$fieldRef" "$fieldInput" "$lang" <(ref::load) \
+  | MORDIOSCRIPTS_FIELD_OUTPUT=$fieldOutput \
+    MORDIOSCRIPTS_FIELD_LABEL=$fieldLabel \
+    MORDIOSCRIPTS_FIELD_INPUT=$fieldInput \
+    uc/eval/bertscore.py "$lang" <(ref::load) \
   | lineProgressBar $nr \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi

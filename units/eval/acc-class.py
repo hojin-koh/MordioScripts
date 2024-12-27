@@ -19,19 +19,20 @@
 # (For real multi-label classification things, please use precision-recall)
 
 import csv
+import os
 import sys
 
 def main():
-    fieldOutput = sys.argv.pop(1)
-    fieldRef = sys.argv.pop(1)
-    fieldInput = sys.argv.pop(1)
+    fieldOutput = os.environ.get('MORDIOSCRIPTS_FIELD_OUTPUT', 'acc')
+    fieldRef = os.environ.get('MORDIOSCRIPTS_FIELD_LABEL', '')
+    fieldInput = os.environ.get('MORDIOSCRIPTS_FIELD_TEXT', '')
     fileLabel = sys.argv.pop(1)
 
     mLabel = {}
     with open(fileLabel, "r", encoding='utf-8') as fp:
         objReader = csv.DictReader(fp)
         fieldKey = objReader.fieldnames[0]
-        if len(fieldRef) == 0:
+        if not fieldRef:
             fieldRef = objReader.fieldnames[1]
         for row in objReader:
             mLabel[row[fieldKey]] = set(row[fieldRef].strip().split())
@@ -40,7 +41,7 @@ def main():
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
     fieldKey = objReader.fieldnames[0]
-    if len(fieldInput) == 0:
+    if not fieldInput:
         fieldInput = objReader.fieldnames[1]
     objWriter = csv.DictWriter(sys.stdout, (fieldKey, fieldOutput), lineterminator="\n")
     objWriter.writeheader()

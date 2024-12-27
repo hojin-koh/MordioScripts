@@ -17,17 +17,18 @@
 # Count how many space-separated tokens are in the specified field or second field
 
 import csv
+import os
 import sys
 
 def main():
-    fieldOutput = sys.argv.pop(1)
-    fieldInput = sys.argv.pop(1)
+    fieldOutput = os.environ.get('MORDIOSCRIPTS_FIELD_OUTPUT', 'ntoken')
+    fieldInput = os.environ.get('MORDIOSCRIPTS_FIELD_TEXT', '')
 
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
     fieldKey = objReader.fieldnames[0]
-    if fieldInput == '':
+    if not fieldInput:
         fieldInput = objReader.fieldnames[1]
     objWriter = csv.DictWriter(sys.stdout, (fieldKey, fieldOutput), lineterminator="\n")
     objWriter.writeheader()

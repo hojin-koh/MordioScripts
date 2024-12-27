@@ -36,7 +36,8 @@ main() {
   local nr
   getMeta in 0 nRecord nr
   in::load \
-  | uc/normalize-unicode.py text "$fieldInput" <(conv::load) \
+  | MORDIOSCRIPTS_FIELD_INPUT=$fieldInput \
+    uc/normalize-unicode.py text <(conv::load) \
   | lineProgressBar $nr \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi
