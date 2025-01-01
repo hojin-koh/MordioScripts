@@ -34,7 +34,7 @@ main() {
   local varFields="MORDIOSCRIPTS_FIELD_OUTPUT=${(q+)fieldOutput} "
   varFields+="MORDIOSCRIPTS_FIELD_LABEL=${(q+)fieldLabel} "
   varFields+="MORDIOSCRIPTS_FIELD_INPUT=${(q+)fieldInput} "
-  local param+="$(in::getLoader) | $varFields uc/eval/acc-class.py <($(label::getLoader))"
+  local param="$(in::getLoader) | $varFields uc/eval/acc-class.py <($(label::getLoader))"
 
   if out::isReal; then
     eval "$param" | out::save

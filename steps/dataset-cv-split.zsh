@@ -14,7 +14,7 @@
 # limitations under the License.
 description="Get all the dataset split spec for cross-validation"
 metaDepScripts=("uc/dataset-cv-split.py")
-metaDepOpts=(nSplit)
+metaDepOpts=(fieldOutput fieldLabel fieldGroup)
 
 setupArgs() {
   opt -r in '' "Input label table"
@@ -22,7 +22,12 @@ setupArgs() {
   opt -r out '()' "Output key table"
   optType out output table
 
-  opt -r nSplit '' "Number of splits"
+  opt inGroup '' "Input group table"
+  optType inGroup input table
+
+  opt fieldOutput 'set' "Name of the field of the set name in the resultant tables"
+  opt fieldLabel '' "Name of reference field. By default the second column"
+  opt fieldGroup '' "Name of group field for adversial splitting. By default the second column"
 }
 
 main() {
@@ -30,17 +35,33 @@ main() {
     err "Unreal table output not supported" 15
   fi
 
-  if [[ $#out != $nSplit ]]; then
-    err "In this configuration, there must be exactly $nSplit output tables" 15
+  local nSplit=$#out
+  info "nSplit = $nSplit"
+
+  local dirTemp
+  putTemp dirTemp
+
+  local varFields="MORDIOSCRIPTS_FIELD_OUTPUT=${(q+)fieldOutput} "
+  varFields+="MORDIOSCRIPTS_FIELD_LABEL=${(q+)fieldLabel} "
+  varFields+="MORDIOSCRIPTS_FIELD_GROUP=${(q+)fieldGroup} "
+  local param="$(in::getLoader) | $varFields uc/dataset-cv-split.py"
+  # TODO: Adversial mode
+  if [[ -n $inGroup ]]; then
+    true
   fi
 
-  # TODO: faster, only 1 call
   for (( i=1; i<=$nSplit; i++ )); do
-    in::load \
-    | uc/dataset-cv-split.py "$nSplit" $[i-1] \
+    mkfifo $dirTemp/$i.pipe
+    param+=" $dirTemp/$i.pipe"
+  done
+  eval "$param" &
+
+  for (( i=1; i<=$nSplit; i++ )); do
+    cat $dirTemp/$i.pipe \
     | out::save $i
     if [[ $? != 0 ]]; then return 1; fi
   done
+  wait
 }
 
 source Mordio/mordio

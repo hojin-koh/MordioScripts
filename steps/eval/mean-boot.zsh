@@ -35,7 +35,7 @@ main() {
     for (( i=1; i<=$#in; i++ )); do
       param+=" <($(in::getLoader $i))"
     done
-    eval "uc/eval/mean-boot.py "$fields" ${tag[1]} $param" \
+    eval "uc/eval/mean-boot.py ${(q+)fields} ${(q+)tag[1]} $param" \
     | out::save
     if [[ $? != 0 ]]; then return 1; fi
   elif [[ $mode == mean ]]; then

@@ -76,10 +76,10 @@ def main():
     with open(fileLabel, 'r', encoding='utf-8') as fp:
         objReader = csv.DictReader(fp)
         fieldKey = objReader.fieldnames[0]
-        if not fieldLabel:
-            nameLabel = objReader.fieldnames[1]
+        if not fieldRef:
+            fieldRef = objReader.fieldnames[1]
         for row in objReader:
-            mLabel[row[fieldKey]] = row[nameLabel]
+            mLabel[row[fieldKey]] = row[fieldRef]
     mLabelToId = {l:i for i,l in enumerate(sorted(set(mLabel.values())))}
 
     sys.stdin.reconfigure(encoding='utf-8')
@@ -124,11 +124,11 @@ def main():
     print("Validation Sample Size: {}".format(len(aDataDev)), file=sys.stderr)
 
     argTrain = TrainingArguments(
-            output_dir=F'tmp/hfoutputs-{os.getpid()}',
+            output_dir=F'tmp/hfoutputs-berttrain-{os.getpid()}',
             save_strategy="epoch",
             save_total_limit=2,
             load_best_model_at_end=True,
-            logging_dir=F'tmp/hfoutputs-{os.getpid()}',
+            logging_dir=F'tmp/hfoutputs-berttrain-{os.getpid()}',
             logging_strategy="epoch",
             logging_first_step=True,
             eval_strategy="epoch",
