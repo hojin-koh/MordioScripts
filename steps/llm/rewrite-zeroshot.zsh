@@ -15,7 +15,7 @@
 description="Do zero-shot text rewrite on a list of documents based on a HF model"
 metaDepScripts=("uc/llm/rewrite-zeroshot.py")
 metaDepOpts=(model tokenizer temperature context)
-veryexpensive=true
+avoidRerun=true
 
 setupArgs() {
   opt -r out '' "Output text"

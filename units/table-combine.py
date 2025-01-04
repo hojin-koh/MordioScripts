@@ -24,8 +24,8 @@ if sys.version_info < (3, 7):
     print("Error: minimum supported python version is 3.7 (for dict to preserve insertion order)", file=sys.stderr)
     sys.exit(37)
 
-def addToRecord(mRecord, mFields, fieldKey, row):
-    for field in mFields.keys():
+def addToRecord(mRecord, aFields, fieldKey, row):
+    for field in aFields:
         if field == fieldKey:
             mRecord[fieldKey] = row[fieldKey]
             continue
