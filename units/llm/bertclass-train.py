@@ -30,9 +30,11 @@ import tqdm.asyncio
 from functools import partialmethod
 try:
     fpShow = open('/dev/fd/5', 'w', encoding='utf-8')
-    tqdm.asyncio.tqdm.__init__ = partialmethod(tqdm.asyncio.tqdm.__init__, file=fpShow, smoothing=0, mininterval=2)
+    tqdm.asyncio.tqdm.__init__ = partialmethod(tqdm.asyncio.tqdm.__init__, file=fpShow)
 except e:
     pass
+finally:
+    tqdm.asyncio.tqdm.__init__ = partialmethod(tqdm.asyncio.tqdm.__init__, smoothing=0, mininterval=2, dynamic_ncols=True)
 
 def computeMetricHF(pred):
     aPreds = pred.predictions.argmax(-1)
