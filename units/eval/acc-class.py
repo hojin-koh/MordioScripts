@@ -23,7 +23,6 @@ import os
 import sys
 
 def main():
-    fieldOutput = os.environ.get('MORDIOSCRIPTS_FIELD_OUTPUT', 'acc')
     fieldRef = os.environ.get('MORDIOSCRIPTS_FIELD_LABEL', '')
     fieldInput = os.environ.get('MORDIOSCRIPTS_FIELD_TEXT', '')
     fileLabel = sys.argv.pop(1)
@@ -42,17 +41,25 @@ def main():
     objReader = csv.DictReader(sys.stdin)
     fieldKey = objReader.fieldnames[0]
     if not fieldInput:
-        fieldInput = objReader.fieldnames[1]
-    objWriter = csv.DictWriter(sys.stdout, (fieldKey, fieldOutput), lineterminator="\n")
+        fieldInput = objReader.fieldnames[1].removesuffix("1")
+    aFields = (fieldKey, F"{fieldInput}-acc", F"{fieldInput}-pred", F"{fieldInput}-ref")
+    objWriter = csv.DictWriter(sys.stdout, aFields, lineterminator="\n")
     objWriter.writeheader()
 
     for row in objReader:
         key = row[fieldKey]
-        if row[fieldInput] in mLabel[key]:
+        fieldRead = F'{fieldInput}1'
+        pred = row[fieldRead]
+        if pred in mLabel[key]:
             acc = 1
         else:
             acc = 0
-        objWriter.writerow({fieldKey: key, fieldOutput: acc})
+        objWriter.writerow({
+            fieldKey: key,
+            aFields[1]: acc,
+            aFields[2]: pred,
+            aFields[3]: ' '.join(mLabel[key]),
+            })
 
 if __name__ == '__main__':
     main()

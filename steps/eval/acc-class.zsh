@@ -12,9 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Compute per-entry accuracy for classification"
+description="Compute per-entry accuracy of multiclass classification predictions"
 metaDepScripts=("uc/eval/acc-class.py")
-metaDepOpts=(fieldOutput fieldLabel fieldInput)
+metaDepOpts=(fieldLabel fieldInput)
 
 setupArgs() {
   opt -r out '' "Output accuracy table"
@@ -25,14 +25,12 @@ setupArgs() {
   opt -r label '' "Input label table"
   optType label input table
 
-  opt fieldOutput 'acc' "Name of the field of the accuracy in the resultant table"
   opt fieldLabel '' "Name of reference field. By default the second column"
   opt fieldInput '' "Name of input field. By default the second column"
 }
 
 main() {
-  local varFields="MORDIOSCRIPTS_FIELD_OUTPUT=${(q+)fieldOutput} "
-  varFields+="MORDIOSCRIPTS_FIELD_LABEL=${(q+)fieldLabel} "
+  local varFields="MORDIOSCRIPTS_FIELD_LABEL=${(q+)fieldLabel} "
   varFields+="MORDIOSCRIPTS_FIELD_INPUT=${(q+)fieldInput} "
   local param="$(in::getLoader) | $varFields uc/eval/acc-class.py <($(label::getLoader))"
 
