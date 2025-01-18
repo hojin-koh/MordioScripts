@@ -12,8 +12,11 @@ scikit-learn
 tqdm
 transformers
 bitsandbytes
+flash-attn
 optimum
 accelerate
+
+# Accelerated inference libraries
 vllm
 
 # Evaluation tools

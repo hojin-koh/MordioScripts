@@ -123,6 +123,8 @@ fi
 if [[ -f "$TARGET/us/requirements.txt" ]]; then
   echo "-r us/requirements.txt"
 fi
+# Library from this script
+echo "-e $DIR_COMMONEXP/pylib"
 ) > "$TARGET/requirements.txt"
 
 # By default, use a local directory as tmp and log
