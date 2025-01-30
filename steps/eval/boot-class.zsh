@@ -33,7 +33,7 @@ main() {
   for (( i=1; i<=$#in; i++ )); do
     param+=" <($(in::getLoader $i))"
   done
-  eval "uc/eval/boot-class.py ${(q+)field} ${(q+)tag} $param" \
+  eval "uc/eval/boot-class.py ${(q+)tag} ${(q+)field} $param" \
   | out::save
   if [[ $? != 0 ]]; then return 1; fi
 }
