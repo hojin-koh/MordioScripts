@@ -115,6 +115,13 @@ def main():
         for idx in aIdxsRef:
             mSupportLabel[idx] = mSupportLabel.get(idx, 0) + 1.0/len(aIdxsRef)
 
+    # Get the empirical value for output
+    # The star notation * dieassembles the np.array at the first dimension, so the resulting dimension is (nSample,)
+    mean = getClassifierStats(*mtxData)
+    print(F"=== Tag {tagOutput} ===", file=sys.stderr)
+    print(F"macro-f1 {mean[-1]:.6f} micro-f1 {mean[-4]:.6f}", file=sys.stderr)
+
+
     # Actually compute the bootstrap things
     rslt = bootstrap(
             mtxData,
@@ -125,9 +132,6 @@ def main():
             statistic=getClassifierStats,
             random_state=np.random.default_rng(),
             )
-    # Use the empirical value for output
-    # The star notation * dieassembles the np.array at the first dimension, so the resulting dimension is (nSample,)
-    mean = getClassifierStats(*mtxData)
     #meanBoot = rslt.bootstrap_distribution.mean(axis=-1)
     lower, upper = rslt.confidence_interval
     if (not (mean>lower).all() or not (mean<upper).all()):
