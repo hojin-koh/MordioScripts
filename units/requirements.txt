@@ -12,7 +12,6 @@ scikit-learn
 tqdm
 transformers
 bitsandbytes
-flash-attn
 optimum
 accelerate
 

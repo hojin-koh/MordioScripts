@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Predict from a HuBERT-based audio classifier
+# Do feature extraction on HuBERT
 
 import csv
 import io
@@ -22,6 +22,7 @@ import os
 import sys
 import tarfile
 
+import numpy as np
 import soundfile as sf
 import torch
 import torch.nn as nn
@@ -132,7 +133,7 @@ class WavLMEmotion(WavLMPreTrainedModel):
 
         return SequenceClassifierOutput(
             logits=logits,
-            hidden_states=outputs.hidden_states,
+            hidden_states=pooled_output,
             attentions=outputs.attentions,
         )
 
@@ -164,11 +165,7 @@ def getCollatorAudioIter(objProcessor):
     return CollateAudioIter
 
 def main():
-    fieldOutput = os.environ.get('MORDIOSCRIPTS_FIELD_OUTPUT', 'pred')
-    fieldKey = os.environ.get('MORDIOSCRIPTS_FIELD_KEY', 'id')
-
     dirModel = sys.argv.pop(1)
-    nBest = int(sys.argv.pop(1))
 
     # Load model
     objProcessor = AutoFeatureExtractor.from_pretrained(dirModel)
@@ -181,42 +178,28 @@ def main():
             ).to('cuda')
     objModel = nn.DataParallel(objModel)
 
-    # Load label mapping from model
-    mIdToLabel = {idx:l for l,idx in sorted(objModel.module.config.label2id.items(), key=lambda p: p[1])}
-    nLabel = len(mIdToLabel)
-    print(F"Labels({nLabel}):", ' '.join(mIdToLabel.values()) ,file=sys.stderr)
-
-    # Prepare output
-    sys.stdout.reconfigure(encoding='utf-8')
-    aCols = [fieldKey]
-    for i in range(nBest):
-        aCols.append(F'{fieldOutput}{i+1}')
-        aCols.append(F'{fieldOutput}{i+1}-score')
-    aCols.append(F'{fieldOutput}-conf')
-    objWriter = csv.DictWriter(sys.stdout, aCols, lineterminator="\n")
-    objWriter.writeheader()
-
     # Load test data
     BATCH = 32
     datasetTest = DatasetAudioIter('/dev/stdin')
     fnCol = getCollatorAudioIter(objProcessor)
     loaderTest = DataLoader(datasetTest, batch_size=BATCH, shuffle=False, pin_memory=True, num_workers=1, collate_fn=fnCol)
 
-    for k,v in loaderTest:
-        v = v.to('cuda')
+    with tarfile.open(fileobj=sys.stdout.buffer, mode='w|') as fpwTar:
+        for k,v in loaderTest:
+            v = v.to('cuda')
 
-        with torch.no_grad():
-            aaLogits = objModel(**v).logits.tolist()
-        for j, aLogits in enumerate(aaLogits):
-            aOut = [(mIdToLabel[idx], pred) for idx,pred in enumerate(aLogits)]
-            aOut = sorted(aOut, key=lambda p: p[1], reverse=True)
+            with torch.no_grad():
+                mtxOutput = objModel(**v).hidden_states
+            for j in range(mtxOutput.shape[0]):
+                vEmbed = np.array(mtxOutput[j].cpu())
+                fpwVector = io.BytesIO()
+                np.save(fpwVector, vEmbed, allow_pickle=False)
 
-            mOutput = {fieldKey: k[j], F'{fieldOutput}-conf': aOut[0][1]}
-            for i in range(nBest):
-                mOutput[F'{fieldOutput}{i+1}'] = aOut[i][0]
-                mOutput[F'{fieldOutput}{i+1}-score'] = aOut[i][1]
-            objWriter.writerow(mOutput)
-        sys.stdout.flush()
+                # New entry for writing
+                entryNew = tarfile.TarInfo(k[j])
+                entryNew.size = fpwVector.getbuffer().nbytes
+                fpwVector.seek(0)
+                fpwTar.addfile(entryNew, fileobj=fpwVector)
 
 if __name__ == '__main__':
     main()
