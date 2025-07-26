@@ -38,7 +38,7 @@ def main():
     lenContext = int(sys.argv.pop(1))
     fileConfig = sys.argv.pop(1)
     fileOutput = sys.argv.pop(1)
-    sizeBatch = 8
+    sizeBatch = 16
 
     # Load the prompts
     promptSys = None
@@ -96,7 +96,7 @@ def main():
             if len(aKeys) == 0 or len(aPrompts) == 0:
                 return
             argSampling.max_tokens = int(max(len(t) for t in aPrompts)*1.5)
-            argSampling.min_tokens = int(min(len(t) for t in aPrompts)*0.2)
+            argSampling.min_tokens = 20
             for i, rslt in enumerate(objLLM.generate(aPrompts, argSampling, use_tqdm=False)):
                 output = rslt.outputs[0].text
                 for s in aStop:

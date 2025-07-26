@@ -21,3 +21,4 @@ vllm
 # Evaluation tools
 bert_score
 rouge_metric
+fast-bleu
