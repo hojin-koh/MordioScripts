@@ -32,12 +32,30 @@ import os
 os.environ['VLLM_LOGGING_LEVEL'] = 'ERROR'
 from vllm import LLM, SamplingParams
 
+def getShortestN(mInput, n):
+    mSorted = sorted(mInput.items(), key=lambda x: len(x[1]))
+    return dict(mSorted[:n])
+
+def getLongestN(mInput, n):
+    mSorted = sorted(mInput.items(), key=lambda x: len(x[1]), reverse=True)
+    return dict(mSorted[:n])
+
+def getClosestN(mInput, n, length):
+    mSorted = sorted(
+        mInput.items(),
+        key=lambda x: abs(len(x[1]) - length)
+    )
+    return dict(mSorted[:n])
+
 def main():
     nameModel = sys.argv.pop(1)
     nameTokenizer = sys.argv.pop(1)
     temperature = float(sys.argv.pop(1))
     lenContext = int(sys.argv.pop(1))
     fileConfig = sys.argv.pop(1)
+    nShot = int(sys.argv.pop(1))
+    fileExample = sys.argv.pop(1)
+    fileAnswer = sys.argv.pop(1)
     fileOutput = sys.argv.pop(1)
     sizeBatch = 16
 
@@ -46,6 +64,7 @@ def main():
     promptUser = None
     promptFinal = None
     aStop = []
+    aBlacklistExample = []
     with open(fileConfig, 'r', encoding='utf-8') as fp:
         objReader = csv.DictReader(fp)
         for row in objReader:
@@ -59,6 +78,8 @@ def main():
                 promptFinal = Template(value)
             elif row['param'] == 'generation-stop':
                 aStop.append(value)
+            elif row['param'] == 'example-blacklist':
+                aBlacklistExample.append(value)
 
     # Get our tokenizer and model
     argModel = {
@@ -66,7 +87,6 @@ def main():
             'tokenizer': nameTokenizer,
             'max_model_len': lenContext,
             'tensor_parallel_size': torch.cuda.device_count(),
-            #'pipeline_parallel_size': torch.cuda.device_count(),
             }
     objLLM = LLM(**argModel)
     objTok = objLLM.get_tokenizer()
@@ -84,6 +104,39 @@ def main():
             top_k=80,
             min_p=0.03,
             )
+
+    mAnswer = {}
+    with open(fileAnswer, "r", encoding='utf-8') as fp:
+        objReader = csv.DictReader(fp)
+        fieldKey = objReader.fieldnames[0]
+        fieldText = objReader.fieldnames[1]
+        for row in objReader:
+            mAnswer[row[fieldKey]] = row[fieldText].replace("\\n", "\n").strip()
+
+    mExample = {}
+    with open(fileExample, "r", encoding='utf-8') as fp:
+        objReader = csv.DictReader(fp)
+        fieldKey = objReader.fieldnames[0]
+        fieldText = objReader.fieldnames[1]
+        for row in objReader:
+            keyThis = row[fieldKey]
+            textThis = row[fieldText].replace("\\n", "\n").strip()
+            answerThis = mAnswer[keyThis]
+            # Length constraint
+            if len(textThis) < 200 or len(textThis) <= len(answerThis)*5:
+                continue
+            isExampleOkay = True
+            # Blacklist texts that would affect fewshot
+            for bannedText in aBlacklistExample:
+                if textThis.find(bannedText) != -1:
+                    isExampleOkay = False
+                    break
+            if isExampleOkay:
+                mExample[keyThis] = textThis
+
+    print("{}/{} usable few-shot examples loaded".format(len(mExample), len(mAnswer)), file=sys.stderr)
+
+    mActualExample = getLongestN(mExample, nShot)
 
     sys.stdin.reconfigure(encoding='utf-8')
     objReader = csv.DictReader(sys.stdin)
@@ -118,6 +171,12 @@ def main():
             mEnv = {'text': text, 'length': len(text)}
             if promptSys:
                 aChat.append({'role': 'system', 'content': promptSys.render(mEnv)})
+            for key,textExample in mActualExample.items():
+                textAnswer = mAnswer[key]
+                if promptUser:
+                    aChat.append({'role': 'user', 'content': promptUser.render({'text': textExample})})
+                if promptFinal:
+                    aChat.append({'role': 'assistant', 'content': promptFinal.render({}) + textAnswer})
             if promptUser:
                 aChat.append({'role': 'user', 'content': promptUser.render(mEnv)})
             if promptFinal:

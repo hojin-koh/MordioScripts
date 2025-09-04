@@ -12,8 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-description="Do zero-shot text rewrite on a list of documents based on a HF model"
-metaDepScripts=("uc/llm/rewrite-zeroshot.py")
+description="Do few-shot text rewrite on a list of documents based on a HF model"
+metaDepScripts=("uc/llm/rewrite-fewshot.py")
 metaDepOpts=(model tokenizer temperature context)
 avoidRerun=true
 
@@ -26,10 +26,16 @@ setupArgs() {
   opt -r config '' "Input config"
   optType config input table
 
+  opt -r inExample '' "Input Example Text"
+  optType inExample input table
+  opt -r inAnswer '' "Input Answer Text"
+  optType inAnswer input table
+
   opt context 8192 "Size of context window to use"
   opt model "unsloth/Llama-3.1-8B-Instruct" "name of HuggingFace model or filename of gguf model"
   opt tokenizer "unsloth/Llama-3.1-8B-Instruct" "name of HuggingFace tokenizer"
   opt temperature 0.6 "Temperature for LLM sampling"
+  opt nshot 4 "Number of examples to provide"
 }
 
 main() {
@@ -46,7 +52,7 @@ main() {
   mkfifo $dirTemp/pipe
 
   in::load \
-  | uc/llm/rewrite-zeroshot.py "$model" "$tokenizer" "$temperature" "$context" <(config::load) $dirTemp/pipe &
+    | uc/llm/rewrite-fewshot.py "$model" "$tokenizer" "$temperature" "$context" <(config::load) "$nshot" <(inExample::load) <(inAnswer::load) $dirTemp/pipe &
 
   cat $dirTemp/pipe \
   | lineProgressBar $nr > $dirTemp/output
