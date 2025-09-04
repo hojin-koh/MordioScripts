@@ -57,6 +57,9 @@ def main():
     for row in objReader:
         key = row[fieldKey]
         text = row[fieldInput].replace("\\n", "\n").strip()
+        # Length constraint
+        if len(text) > len(mRef[key]):
+            text = text[:len(mRef[key])]
         # The cursed brackets are because this library expects hyp to be in a list, and ref in a list of lists (to support multiple references)
         mRouge = objRouge.evaluate([text], [[mRef[key]]])
         mRslt = {fieldKey: key}
