@@ -41,7 +41,7 @@ main() {
   getMeta in 0 nRecord nr
 
   # ROUGE is a bit slow, and we expect evaluations to run fast
-  if [[ $nr -lt 500 ]]; then
+  if [[ $nr -lt 2000 ]]; then
     in::load \
     | processSub \
     | lineProgressBar $nr \
